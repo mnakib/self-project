@@ -13,25 +13,23 @@
 
 ### Services to offer
 
-Proxmox
+- Proxmox
     https://www.proxmox.com/en/
-BigBlueButton (with integration to Moodle)
+- BigBlueButton (with integration to Moodle)
     https://bigbluebutton.org/
     https://moodle.com/certified-integrations/bigbluebutton/
     https://bigbluebutton.org/articles/bigbluebutton-wins-moodle-certified-partner-award/
 
-Moodle LMS
+- Moodle LMS
     https://moodle.org/
-pfSense - Pare-feu Open Source - NetGate
+- pfSense - Pare-feu Open Source - NetGate
     https://www.pfsense.org/
-DSpace - Plateformes d'archivage numérique
+- DSpace - Plateformes d'archivage numérique
     https://www.dspace.com/en/pub/home.cfm
-Zimbra - Configuration de services de messagerie sécurisés.
+- Zimbra - Configuration de services de messagerie sécurisés.
     https://www.zimbra.com/
-
-
-Implémentation d'une solution la voix sur IP GSM Gateway (FreePBX)
-PlaySMS - Implémentation d'une solution SMS Gateway
+- FreePBX - Implémentation d'une solution la voix sur IP GSM Gateway
+- PlaySMS - Implémentation d'une solution SMS Gateway
 
 
 
