@@ -11,11 +11,11 @@ AzureRegion="northeurope"
 VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 VNetAddressPrefix="10.5.0.0/20"
 
-APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-BASTION_Subnet_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
+APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+BASTION_Subnet_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 
 APPGW_Subnet_AddressPrefix="10.5.1.0/24"
 WEB_Subnet_AddressPrefix="10.5.2.0/24"
@@ -23,11 +23,11 @@ APP_Subnet_AddressPrefix="10.5.3.0/24"
 DB_Subnet_AddressPrefix="10.5.4.0/24"
 BASTION_Subnet_AddressPrefix="10.5.5.0/24"
 
-APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-APPGWPublicIPName="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
+APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGWPublicIPName="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 
-BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
-BastionPublicIPName="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 1)))"
+BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+BastionPublicIPName="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 ```
 
 
