@@ -23,11 +23,31 @@ APP_Subnet_AddressPrefix="10.5.3.0/24"
 DB_Subnet_AddressPrefix="10.5.4.0/24"
 BASTION_Subnet_AddressPrefix="10.5.5.0/24"
 
-APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-APPGWPublicIPName="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 
-BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-BastionPublicIPName="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+
+APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_PublicIP_SKU="Standard"
+APPGW_PublicIP_Tier="Regional"
+APPGW_PublicIP_AllocationMethod="Static"
+
+APPGW_Name="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_SKU="WAF_v2"
+APPGW_CAPACITY=2
+APPGW_FE_PORT=80
+APPGW_HTTP_SETTINGS_COOKIE_BASED_AFFINITY="Disabled"
+APPGW_SETTINGS-PORT=80
+APPGW_SETTINGS_PROTOCOL="Http"
+
+
+BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+Bastion_PublicIP_SKU="Standard"
+Bastion_PublicIP_Tier="Regional"
+Bastion_PublicIP_AllocationMethod="Static"
+
+
+BastionName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+BastionSKU="Standard"
+
 ```
 
 
@@ -119,6 +139,27 @@ az network public-ip create \
   --allocation-method Static
 ```
 
+### Creating the Web Frontend Application Gateway
+```bash
+az network application-gateway create \
+  --name $APPGW_Name \
+  --location AzureRegion \
+  --resource-group RGName \
+  --sku $APPGW_SKU \
+  --capacity $APPGW_CAPACITY \
+  --frontend-port $APPGW_FE_PORT \
+  --http-settings-cookie-based-affinity $APPGW_HTTP_SET_COOKIE_AFFINITY \
+  --http-settings-port $APPGW_SET-PORT \
+  --http-settings-protocol $APPGW_SET_PROTOCOL \
+  --vnet-name $VNetName \
+  --subnet APPGW_Subnet_Name \
+  --public-ip-address APPGWPublicIPName
+```
+
+
+
+
+
 ### Creating the Bastion Host
 ```bash
 az network bastion create \
@@ -131,7 +172,9 @@ az network bastion create \
 ```
 
 
-## Frontend Virtual Machines Deployment
+
+
+## Frontend Scale Set VMs Deployment
 
 ## Testing Connectivity to the Frontend VMs
 
@@ -166,6 +209,8 @@ az network bastion create \
   --vnet-name $VNetName \
   --public-ip-address $PublicIPName
 ```
+
+
 
 
 
