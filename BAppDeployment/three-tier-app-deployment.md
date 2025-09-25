@@ -63,7 +63,7 @@ az network vnet subnet create \
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNetName \
-  --name $BASTION_Subnet_Name \
+  --name AzureBastionSubnet \
   --address-prefix $BASTION_Subnet_AddressPrefix
 ```
 
