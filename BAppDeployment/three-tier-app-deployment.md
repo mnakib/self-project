@@ -6,13 +6,13 @@
 
 ```bash
 RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
-AzureRegion="northeurope"
+AzureRegion="westeurope"
 
 VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 VNetAddressPrefix="10.5.0.0/20"
 
 APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-BASTION_Subnet_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+BASTION_Subnet_Name="AzureBastionSubnet"
 WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
@@ -90,7 +90,7 @@ az network vnet subnet create \
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNetName \
-  --name $DB_Subnet_30_Name \
+  --name $DB_Subnet_Name \
   --address-prefix $DB_Subnet_AddressPrefix
 ```
 
