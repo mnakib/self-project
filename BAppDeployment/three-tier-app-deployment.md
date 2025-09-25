@@ -5,21 +5,31 @@
 ### Set the Resources Names
 
 ```bash
-$RGName = "RGName"
-$AzureRegion = "westfrance"
+RGName="rg-bea-non_prod_partenaire-non_prod-ne-$((001 + RANDOM % 700))"
+AzureRegion="northeurope"
 
-$VNetName = "VNetName"
-$VNetAddressPrefix = "10.0.0.0/16"
-$WEB_Subnet_1 = "WEB_Subnet_1"
-$APP_Subnet_2 = "APP_Subnet_2"
-$DB_Subnet_3 = "DB_Subnet_3"
-$WEB_Subnet_1_AddressPrefix = "10.1.0.0/24"
-$APP_Subnet_2_AddressPrefix = "10.2.0.0/24"
-$DB_Subnet_3_AddressPrefix = "10.3.0.0/24"
+VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$((001 + RANDOM % 700))"
+VNetAddressPrefix="10.5.0.0/20"
 
-$BastionSubnet_AddressPrefix="10.0.10.0/27"
-$BastionHostName = "BastionHostName"
-$BastionPublicIPName = "BastionHost-IP"
+APPGW_Subnet_100_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+BASTION_Subnet_110_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+WEB_Subnet_110_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+APP_Subnet_120_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+DB_Subnet_130_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+
+APPGW_Subnet_100_AddressPrefix="10.5.100.0/24"
+BASTION_Subnet_110_AddressPrefix="10.5.110.0/24"
+WEB_Subnet_10_AddressPrefix="10.5.10.0/24"
+APP_Subnet_20_AddressPrefix="10.5.20.0/24"
+DB_Subnet_30_AddressPrefix="10.5.30.0/24"
+
+APPGWName = "app_gw-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+APPGWPublicIPName = "app_gw_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+
+
+
+BastionHostName = "bst_host-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+$BastionPublicIPName = "bst_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
 ```
 
 
@@ -32,7 +42,6 @@ az group create --name $RGName --location $AzureRegion
 ### Create the Virtual Network and Subnets
 
 #### Create the Virtual Network
-
 ```bash
 az network vnet create \
   --resource-group $RGName \
@@ -40,16 +49,28 @@ az network vnet create \
   --address-prefix $VNetAddressPrefix
 ```
 
-#### Create the VMs Subnets
+#### Creating the VMs Subnets
 
+##### Create the Application Gateway subnet
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNetName \
-  --name $WEB_Subnet_1 \
-  --address-prefix $WEB_Subnet_1_AddressPrefix
+  --name APPGW_Subnet_100_Name \
+  -- APPGW_Subnet_100
+  --address-prefix $APPGW_Subnet_100_AddressPrefix
 ```
 
+##### Create the Bastion Host Subnet
+```bash
+az network vnet subnet create \
+  --resource-group $RGName \
+  --vnet-name $VNetName \
+  --name BASTION_Subnet_110_Name \
+  --address-prefix $BASTION_Subnet_110_AddressPrefix
+```
+
+##### Create the Application Sunet
 ```bash
     az network vnet subnet create \
   --resource-group $RGName \
