@@ -117,16 +117,6 @@ az network vnet subnet create \
 
 ### Creating the Public IPs
 
-#### Create the Application Gateway Public IP
-```bash
-az network public-ip create \
-  --resource-group $RGName \
-  --name $APPGWPublicIPName \
-  --location $AzureRegion \
-  --sku Standard \
-  --tier Regional \
-  --allocation-method Static
-```
 
 #### Create the Bastion Bastion Public IP
 ```bash
@@ -134,29 +124,10 @@ az network public-ip create \
   --resource-group $RGName \
   --name $BastionPublicIPName \
   --location $AzureRegion \
-  --sku Standard \
-  --tier Regional \
-  --allocation-method Static
+  --sku $Bastion_PublicIP_SKU \
+  --tier $Bastion_PublicIP_Tier \
+  --allocation-method $Bastion_PublicIP_AllocationMethod
 ```
-
-### Creating the Web Frontend Application Gateway
-```bash
-az network application-gateway create \
-  --name $APPGW_Name \
-  --location AzureRegion \
-  --resource-group RGName \
-  --sku $APPGW_SKU \
-  --capacity $APPGW_CAPACITY \
-  --frontend-port $APPGW_FE_PORT \
-  --http-settings-cookie-based-affinity $APPGW_HTTP_SET_COOKIE_AFFINITY \
-  --http-settings-port $APPGW_SET-PORT \
-  --http-settings-protocol $APPGW_SET_PROTOCOL \
-  --vnet-name $VNetName \
-  --subnet APPGW_Subnet_Name \
-  --public-ip-address APPGWPublicIPName
-```
-
-
 
 
 
@@ -176,9 +147,68 @@ az network bastion create \
 
 ## Frontend Scale Set VMs Deployment
 
+#### Create the VM Scale Set
+
+```bash
+az vmss create \
+  --resource-group $RGName \
+  --name MyScaleSet \
+  --image Ubuntu2204 \
+  --upgrade-policy-mode automatic \
+  --admin-username azureuser \
+  --generate-ssh-keys \
+  --vnet-name MyVNet \
+  --subnet MySubnet \
+  --lb MyLoadBalancer \
+  --backend-pool-name MyBackEndPool \
+  --instance-count 2 \
+  --vm-sku Standard_DS1_v2 \
+  --location uaeNorth
+```
+
+
 ## Testing Connectivity to the Frontend VMs
 
 ## Application Gateway Deployment
+
+#### Create the Application Gateway Public IP
+```bash
+az network public-ip create \
+  --resource-group $RGName \
+  --name $APPGWPublicIPName \
+  --location $AzureRegion \
+  --sku $APPGW_PublicIP_SKU \
+  --tier $APPGW_PublicIP_Tier \
+  --allocation-method $APPGW_PublicIP_AllocationMethod
+```
+
+#### Creating the Web Frontend Application Gateway
+```bash
+az network application-gateway create \
+  --name $APPGW_Name \
+  --location $AzureRegion \
+  --resource-group $RGName \
+  --sku $APPGW_SKU \
+  --capacity $APPGW_CAPACITY \
+  --frontend-port $APPGW_FE_PORT \
+  --http-settings-cookie-based-affinity $APPGW_HTTP_SET_COOKIE_AFFINITY \
+  --http-settings-port $APPGW_SET-PORT \
+  --http-settings-protocol $APPGW_SET_PROTOCOL \
+  --vnet-name $VNetName \
+  --subnet $APPGW_Subnet_Name \
+  --public-ip-address $APPGWPublic_IPName
+```
+
+```bash
+az network application-gateway address-pool create \
+  --gateway-name $APPGW_Name \
+  --resource-group $RGName \
+  --name AppGW_Web_Backend_Pool
+  --servers 10.0.0.4 10.0.0.5
+```
+
+
+
 
 ## Testing Connectivity to Application Gateway and Checking Proper Routing
 
