@@ -39,7 +39,7 @@ VMSS_Image=Ubuntu2204
 VMSS_Upgrade_Policy=automatic
 VMSS_Admin_UserName=azureuser
 VMSS_Instance_Count=2
-VMSS_SKU=Standard_DS1_v2
+VMSS_SKU=B2als_v2
 VMSS_Bakend_PoolName=APPGW_Backend_Pool
 VMSS_APPGW=$APPGW_Name
 
@@ -60,10 +60,8 @@ APPGW_SKU="WAF_v2"
 APPGW_CAPACITY=2
 APPGW_FE_PORT=80
 APPGW_HTTP_SETTINGS_COOKIE_BASED_AFFINITY="Disabled"
-APPGW_SETTINGS-PORT=80
+APPGW_SETTINGS_PORT=80
 APPGW_SETTINGS_PROTOCOL="Http"
-
-
 
 
 ```
@@ -180,8 +178,27 @@ az vmss create \
   --instance-count $VMSS_Instance_Count \
   --vm-sku $VMSS_SKU \
   --location $AzureRegion \
-  --backend-pool-name APPGW_Backend_Pool \
-  --app-gateway $APPGW_Name
+
+```
+
+```bash
+az disk create \
+  --resource-group $RGName \
+  --name VMSS_disk-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1))) \
+  --size-gb 5 \
+  --location uaeNorth \
+  --sku Standard_LRS
+```
+
+
+#### Attach a Managed Disk to Each VM in the Scale Set
+```bash
+az vmss disk attach \
+  --resource-group $RGName \
+  --vmss-name $VMSS_Name \
+  --size-gb 500 \
+  --sku StandardSSD_ZRS
+
 ```
 
 
