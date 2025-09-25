@@ -8,8 +8,8 @@
 RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
 AzureRegion="westeurope"
 
-VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-VNetAddressPrefix="10.5.0.0/20"
+VNet_Name="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+VNet_AddressPrefix="10.5.0.0/20"
 
 APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 BASTION_Subnet_Name="AzureBastionSubnet"
@@ -22,6 +22,31 @@ WEB_Subnet_AddressPrefix="10.5.2.0/24"
 APP_Subnet_AddressPrefix="10.5.3.0/24"
 DB_Subnet_AddressPrefix="10.5.4.0/24"
 BASTION_Subnet_AddressPrefix="10.5.5.0/24"
+
+
+
+BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+Bastion_PublicIP_SKU="Standard"
+Bastion_PublicIP_Tier="Regional"
+Bastion_PublicIP_AllocationMethod="Static"
+
+BastionName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+BastionSKU="Standard"
+
+
+VMSS_Name=vmss-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+VMSS_Image=Ubuntu2204
+VMSS_Upgrade_Policy=automatic
+VMSS_Admin_UserName=azureuser
+VMSS_Instance_Count=2
+VMSS_SKU=Standard_DS1_v2
+VMSS_Bakend_PoolName=APPGW_Backend_Pool
+VMSS_APPGW=$APPGW_Name
+
+
+
+
+
 
 
 
@@ -39,14 +64,7 @@ APPGW_SETTINGS-PORT=80
 APPGW_SETTINGS_PROTOCOL="Http"
 
 
-BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-Bastion_PublicIP_SKU="Standard"
-Bastion_PublicIP_Tier="Regional"
-Bastion_PublicIP_AllocationMethod="Static"
 
-
-BastionName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-BastionSKU="Standard"
 
 ```
 
@@ -115,10 +133,10 @@ az network vnet subnet create \
 ```
 
 
-### Creating the Public IPs
+### Deploying the Bastion Host 
 
+#### Create the Bastion Public IP
 
-#### Create the Bastion Bastion Public IP
 ```bash
 az network public-ip create \
   --resource-group $RGName \
@@ -130,8 +148,8 @@ az network public-ip create \
 ```
 
 
+#### Create the Bastion Host
 
-### Creating the Bastion Host
 ```bash
 az network bastion create \
   --name $BastionHostName \
@@ -169,7 +187,7 @@ az vmss create \
 
 ## Testing Connectivity to the Frontend VMs
 
-## Application Gateway Deployment
+### Application Gateway Deployment
 
 #### Create the Application Gateway Public IP
 ```bash
@@ -199,14 +217,26 @@ az network application-gateway create \
   --public-ip-address $APPGWPublic_IPName
 ```
 
+#### Link the the Application GW to the the VMSS backend pool:
+
 ```bash
 az network application-gateway address-pool create \
   --gateway-name $APPGW_Name \
   --resource-group $RGName \
-  --name AppGW_Web_Backend_Pool
-  --servers 10.0.0.4 10.0.0.5
+  --name APPGW_Backend_Pool
+  --servers X.X.X.X X.X.X.X
 ```
 
+```bash
+az network application-gateway rule create \
+  --gateway-name APPGW_Name \
+  --resource-group $RGName \
+  --name AppGW_RoutingRule \
+  --address-pool APPGW_Backend_Pool \
+  --http-listener appGatewayHttpListener \
+  --rule-type Basic \
+  --http-settings appGatewayBackendHttpSettings
+```
 
 
 
