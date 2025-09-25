@@ -181,6 +181,8 @@ az vmss create \
 
 ```
 
+#### Create a Managed Disk to Each VM in the Scale Set
+
 ```bash
 az disk create \
   --resource-group $RGName \
