@@ -180,19 +180,6 @@ az vmss create \
   --location $AzureRegion \
 
 ```
-
-#### Create a Managed Disk to Each VM in the Scale Set
-
-```bash
-az disk create \
-  --resource-group $RGName \
-  --name VMSS_disk-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1))) \
-  --size-gb 5 \
-  --location uaeNorth \
-  --sku Standard_LRS
-```
-
-
 #### Attach a Managed Disk to Each VM in the Scale Set
 ```bash
 az vmss disk attach \
@@ -200,7 +187,6 @@ az vmss disk attach \
   --vmss-name $VMSS_Name \
   --size-gb 500 \
   --sku StandardSSD_ZRS
-
 ```
 
 
