@@ -81,7 +81,7 @@ az group create --name $RGName --location $AzureRegion
 ```bash
 az network vnet create \
   --resource-group $RGName \
-  --name $VNetName \
+  --name $VNet_Name \
   --address-prefix $VNetAddressPrefix
 ```
 
@@ -91,7 +91,7 @@ az network vnet create \
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --name $APPGW_Subnet_Name \
   --address-prefix $APPGW_Subnet_AddressPrefix
 ```
@@ -100,7 +100,7 @@ az network vnet subnet create \
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --name AzureBastionSubnet \
   --address-prefix $BASTION_Subnet_AddressPrefix
 ```
@@ -109,7 +109,7 @@ az network vnet subnet create \
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --name $WEB_Subnet_Name \
   --address-prefix $WEB_Subnet_AddressPrefix
 ```
@@ -118,7 +118,7 @@ az network vnet subnet create \
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --name $APP_Subnet_Name \
   --address-prefix $APP_Subnet_AddressPrefix
 ```
@@ -127,7 +127,7 @@ az network vnet subnet create \
 ```bash
 az network vnet subnet create \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --name $DB_Subnet_Name \
   --address-prefix $DB_Subnet_AddressPrefix
 ```
@@ -154,10 +154,10 @@ az network public-ip create \
 az network bastion create \
   --name $BastionHostName \
   --resource-group $RGName \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --location $AzureRegion \
   --public-ip-address $BastionPublicIPName \
-  --sku Standard
+  --sku $BastionSKU
 ```
 
 
@@ -170,22 +170,22 @@ az network bastion create \
 ```bash
 az vmss create \
   --resource-group $RGName \
-  --name MyScaleSet \
-  --image Ubuntu2204 \
-  --upgrade-policy-mode automatic \
-  --admin-username azureuser \
+  --name $VMSS_Name \
+  --image $VMSS_Image \
+  --upgrade-policy-mode $VMSS_Upgrade_Policy \
+  --admin-username $VMSS_Admin_UserName \
   --generate-ssh-keys \
-  --vnet-name MyVNet \
-  --subnet MySubnet \
-  --lb MyLoadBalancer \
-  --backend-pool-name MyBackEndPool \
-  --instance-count 2 \
-  --vm-sku Standard_DS1_v2 \
-  --location uaeNorth
+  --vnet-name $VNet_Name \
+  --subnet $WEB_Subnet_Name \
+  --instance-count $VMSS_Instance_Count \
+  --vm-sku $VMSS_SKU \
+  --location $AzureRegion \
+  --backend-pool-name APPGW_Backend_Pool \
+  --app-gateway $APPGW_Name
 ```
 
 
-## Testing Connectivity to the Frontend VMs
+## Testing Connectivity via Bastion to the Frontend VMs
 
 ### Application Gateway Deployment
 
@@ -212,7 +212,7 @@ az network application-gateway create \
   --http-settings-cookie-based-affinity $APPGW_HTTP_SET_COOKIE_AFFINITY \
   --http-settings-port $APPGW_SET-PORT \
   --http-settings-protocol $APPGW_SET_PROTOCOL \
-  --vnet-name $VNetName \
+  --vnet-name $VNet_Name \
   --subnet $APPGW_Subnet_Name \
   --public-ip-address $APPGWPublic_IPName
 ```
@@ -259,16 +259,6 @@ az network application-gateway rule create \
 
 
 
-## Bastion Host Deployment
-
-```bash
-az network bastion create \
-  --name $BastionName \
-  --resource-group $RGName \
-  --location $Location \
-  --vnet-name $VNetName \
-  --public-ip-address $PublicIPName
-```
 
 
 
