@@ -34,7 +34,7 @@ BastionName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM 
 BastionSKU="Standard"
 
 
-VMSS_Name=vmss-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+VMSS_Name="vmss-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 VMSS_Image=Ubuntu2204
 VMSS_Upgrade_Policy=automatic
 VMSS_Admin_UserName=azureuser
