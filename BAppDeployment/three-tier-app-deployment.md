@@ -23,23 +23,21 @@ WEB_Subnet_10_AddressPrefix="10.5.10.0/24"
 APP_Subnet_20_AddressPrefix="10.5.20.0/24"
 DB_Subnet_30_AddressPrefix="10.5.30.0/24"
 
-APPGWName = "app_gw-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
 APPGWPublicIPName = "app_gw_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
 
-
-
-BastionHostName = "bst_host-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-$BastionPublicIPName = "bst_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+BastionPublicIPName="bst_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
 ```
 
 
-### Create the Resource Group
+### Creating the Resource Group
 
 ```bash
 az group create --name $RGName --location $AzureRegion
 ```
 
-### Create the Virtual Network and Subnets
+### Creating the Virtual Network and Subnets
 
 #### Create the Virtual Network
 ```bash
