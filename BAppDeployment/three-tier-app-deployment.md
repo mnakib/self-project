@@ -5,29 +5,29 @@
 ### Set the Resources Names
 
 ```bash
-RGName="rg-bea-non_prod_partenaire-non_prod-ne-$((001 + RANDOM % 700))"
+RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((1 + RANDOM % 100)))""
 AzureRegion="northeurope"
 
-VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$((001 + RANDOM % 700))"
+VNetName="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
 VNetAddressPrefix="10.5.0.0/20"
 
-APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-BASTION_Subnet_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+BASTION_Subnet_Name="bst_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
 
-APPGW_Subnet_AddressPrefix="10.5.16.0/24"
-BASTION_Subnet_AddressPrefix="10.5.32.0/24"
-WEB_Subnet_AddressPrefix="10.5.48.0/24"
-APP_Subnet_AddressPrefix="10.5.64.0/24"
-DB_Subnet_AddressPrefix="10.5.80.0/24"
+APPGW_Subnet_AddressPrefix="10.5.1.0/24"
+WEB_Subnet_AddressPrefix="10.5.2.0/24"
+APP_Subnet_AddressPrefix="10.5.3.0/24"
+DB_Subnet_AddressPrefix="10.5.4.0/24"
+BASTION_Subnet_AddressPrefix="10.5.5.0/24"
 
-APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-APPGWPublicIPName="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+APPGWName="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+APPGWPublicIPName="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
 
-BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
-BastionPublicIPName="bst_ip-bea-non_prod_partenaire-nonprod-ne-echo $((1 + RANDOM % 100))"
+BastionHostName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
+BastionPublicIPName="bst_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((1 + RANDOM % 100)))""
 ```
 
 
