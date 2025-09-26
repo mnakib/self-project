@@ -94,14 +94,6 @@ az network vnet subnet create \
   --address-prefix $APPGW_Subnet_AddressPrefix
 ```
 
-##### Create the Bastion Host Subnet
-```bash
-az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name AzureBastionSubnet \
-  --address-prefix $BASTION_Subnet_AddressPrefix
-```
 
 ##### Create the WEB Subnet
 ```bash
@@ -128,6 +120,15 @@ az network vnet subnet create \
   --vnet-name $VNet_Name \
   --name $DB_Subnet_Name \
   --address-prefix $DB_Subnet_AddressPrefix
+```
+
+##### Create the Bastion Host Subnet
+```bash
+az network vnet subnet create \
+  --resource-group $RGName \
+  --vnet-name $VNet_Name \
+  --name AzureBastionSubnet \
+  --address-prefix $BASTION_Subnet_AddressPrefix
 ```
 
 
@@ -160,38 +161,6 @@ az network bastion create \
 
 
 
-
-## Frontend Scale Set VMs Deployment
-
-#### Create the VM Scale Set
-
-```bash
-az vmss create \
-  --resource-group $RGName \
-  --name $VMSS_Name \
-  --image $VMSS_Image \
-  --upgrade-policy-mode $VMSS_Upgrade_Policy \
-  --admin-username $VMSS_Admin_UserName \
-  --generate-ssh-keys \
-  --vnet-name $VNet_Name \
-  --subnet $WEB_Subnet_Name \
-  --instance-count $VMSS_Instance_Count \
-  --vm-sku $VMSS_SKU \
-  --location $AzureRegion \
-
-```
-#### Attach a Managed Disk to Each VM in the Scale Set
-```bash
-az vmss disk attach \
-  --resource-group $RGName \
-  --vmss-name $VMSS_Name \
-  --size-gb 500 \
-  --sku StandardSSD_ZRS
-```
-
-
-## Testing Connectivity via Bastion to the Frontend VMs
-
 ### Application Gateway Deployment
 
 #### Create the Application Gateway Public IP
@@ -222,6 +191,36 @@ az network application-gateway create \
   --public-ip-address $APPGWPublic_IPName
 ```
 
+
+
+## Frontend Scale Set VMs Deployment
+
+#### Create the VM Scale Set
+
+```bash
+az vmss create \
+  --resource-group $RGName \
+  --name $VMSS_Name \
+  --image $VMSS_Image \
+  --upgrade-policy-mode $VMSS_Upgrade_Policy \
+  --admin-username $VMSS_Admin_UserName \
+  --generate-ssh-keys \
+  --vnet-name $VNet_Name \
+  --subnet $WEB_Subnet_Name \
+  --instance-count $VMSS_Instance_Count \
+  --vm-sku $VMSS_SKU \
+  --location $AzureRegion
+```
+#### Attach a Managed Disk to Each VM in the Scale Set
+```bash
+az vmss disk attach \
+  --resource-group $RGName \
+  --vmss-name $VMSS_Name \
+  --size-gb 500 \
+  --sku StandardSSD_ZRS
+```
+
+
 #### Link the the Application GW to the the VMSS backend pool:
 
 ```bash
@@ -241,6 +240,41 @@ az network application-gateway rule create \
   --http-listener appGatewayHttpListener \
   --rule-type Basic \
   --http-settings appGatewayBackendHttpSettings
+```
+
+#### Create the Web Subnet NSG
+
+```bash
+# Variables
+NSG_Name="MyNSG"
+NSGRule_Name="AllowHTTPFromSubnet"
+NSG_RulePriority=100
+NSG_RuleSourceSubnet=AzureApplicationGateway
+
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_Name
+
+# Create the NSG rule to allow HTTP from the specific subnet
+az network nsg rule create \
+  --resource-group $RGName \
+  --nsg-name $NSG_Name \
+  --name $NSGRule_Name \
+  --priority $NSG_RulePriority \
+  --direction Inbound \
+  --access Allow \
+  --protocol Tcp \
+  --source-address-prefixes $NSG_RuleSourceSubnet \
+  --destination-port-ranges 80
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_name \
+  --name $WEB_Subnet_Name \
+  --network-security-group $NSG_Name
+
 ```
 
 
