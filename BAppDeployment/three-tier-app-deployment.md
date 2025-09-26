@@ -138,7 +138,7 @@ az network vnet subnet create \
 ```bash
 az network public-ip create \
   --resource-group $RGName \
-  --name $BastionPublicIPName \
+  --name $BastionPublicIP_Name \
   --location $AzureRegion \
   --sku $Bastion_PublicIP_SKU \
   --tier $Bastion_PublicIP_Tier \
