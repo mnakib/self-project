@@ -80,7 +80,7 @@ az group create --name $RGName --location $AzureRegion
 az network vnet create \
   --resource-group $RGName \
   --name $VNet_Name \
-  --address-prefix $VNetAddressPrefix
+  --address-prefix $VNet_AddressPrefix
 ```
 
 #### Creating the Subnets
