@@ -5,24 +5,17 @@
 ### Setting the Resources Names
 
 ```bash
-RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
-AzureRegion="westeurope"
 
-VNet_Name="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-VNet_AddressPrefix="10.5.0.0/20"
 
-APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-BASTION_Subnet_Name="AzureBastionSubnet"
-WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 
-APPGW_Subnet_AddressPrefix="10.5.1.0/24"
-WEB_Subnet_AddressPrefix="10.5.2.0/24"
-APP_Subnet_AddressPrefix="10.5.3.0/24"
-DB_Subnet_AddressPrefix="10.5.4.0/24"
-BASTION_Subnet_AddressPrefix="10.5.5.0/24"
 
+SFTP_Subnet_Name="snet_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+
+
+SFTP_Subnet_AddressPrefix=10.5.5.0/24
+BASTION_Subnet_AddressPrefix="10.5.10.0/24"
+
+ 
 
 
 BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
@@ -62,21 +55,28 @@ APPGW_FE_PORT=80
 APPGW_HTTP_SETTINGS_COOKIE_BASED_AFFINITY="Disabled"
 APPGW_SETTINGS_PORT=80
 APPGW_SETTINGS_PROTOCOL="Http"
-
-
 ```
 
 
 ### Creating the Resource Group
 
 ```bash
+# Variables
+RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
+AzureRegion="westeurope"
+
 az group create --name $RGName --location $AzureRegion
 ```
 
 ### Creating the Virtual Network and Subnets
 
 #### Create the Virtual Network
+
 ```bash
+# Variables
+VNet_Name="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+VNet_AddressPrefix="10.5.0.0/20"
+
 az network vnet create \
   --resource-group $RGName \
   --name $VNet_Name \
@@ -86,7 +86,12 @@ az network vnet create \
 #### Creating the Subnets
 
 ##### Create the Application Gateway subnet
+
 ```bash
+# Variables
+APPGW_Subnet_Name="app_gw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_Subnet_AddressPrefix=10.5.1.0/24
+
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
@@ -97,6 +102,10 @@ az network vnet subnet create \
 
 ##### Create the WEB Subnet
 ```bash
+# Variables
+WEB_Subnet_Name="snet_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+WEB_Subnet_AddressPrefix=10.5.2.0/24
+
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
@@ -104,8 +113,13 @@ az network vnet subnet create \
   --address-prefix $WEB_Subnet_AddressPrefix
 ```
 
+
 ##### Create the APP Subnet
 ```bash
+# Variables
+APP_Subnet_Name="snet_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APP_Subnet_AddressPrefix=10.5.3.0/24
+
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
@@ -115,12 +129,61 @@ az network vnet subnet create \
 
 ##### Create the DB Subnet
 ```bash
+# Variables
+DB_Subnet_Name="snet_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+DB_Subnet_AddressPrefix=10.5.4.0/24
+
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
   --name $DB_Subnet_Name \
   --address-prefix $DB_Subnet_AddressPrefix
 ```
+
+##### Create the SFTP Subnet
+```bash
+az network vnet subnet create \
+  --resource-group $RGName \
+  --vnet-name $VNet_Name \
+  --name $DB_Subnet_Name \
+  --address-prefix $DB_Subnet_AddressPrefix
+```
+
+### Create the Web Subnet NSG
+
+```bash
+# Variables
+NSG_Name="MyNSG"
+NSGRule_Name="AllowHTTPFromSubnet"
+NSG_RulePriority=100
+NSG_RuleSourceSubnet=AzureApplicationGateway
+
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_Name
+
+# Create the NSG rule to allow HTTP from the specific subnet
+az network nsg rule create \
+  --resource-group $RGName \
+  --nsg-name $NSG_Name \
+  --name $NSGRule_Name \
+  --priority $NSG_RulePriority \
+  --direction Inbound \
+  --access Allow \
+  --protocol Tcp \
+  --source-address-prefixes $NSG_RuleSourceSubnet \
+  --destination-port-ranges 80
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_name \
+  --name $WEB_Subnet_Name \
+  --network-security-group $NSG_Name
+```
+
+
 
 ##### Create the Bastion Host Subnet
 ```bash
@@ -242,40 +305,6 @@ az network application-gateway rule create \
   --http-settings appGatewayBackendHttpSettings
 ```
 
-#### Create the Web Subnet NSG
-
-```bash
-# Variables
-NSG_Name="MyNSG"
-NSGRule_Name="AllowHTTPFromSubnet"
-NSG_RulePriority=100
-NSG_RuleSourceSubnet=AzureApplicationGateway
-
-# Create the NSG
-az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_Name
-
-# Create the NSG rule to allow HTTP from the specific subnet
-az network nsg rule create \
-  --resource-group $RGName \
-  --nsg-name $NSG_Name \
-  --name $NSGRule_Name \
-  --priority $NSG_RulePriority \
-  --direction Inbound \
-  --access Allow \
-  --protocol Tcp \
-  --source-address-prefixes $NSG_RuleSourceSubnet \
-  --destination-port-ranges 80
-
-# Associate the NSG with the subnet
-az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_name \
-  --name $WEB_Subnet_Name \
-  --network-security-group $NSG_Name
-
-```
 
 
 
