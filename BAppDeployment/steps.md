@@ -5,23 +5,7 @@
 ### Setting the Resources Names
 
 ```bash
-BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-Bastion_PublicIP_SKU="Standard"
-Bastion_PublicIP_Tier="Regional"
-Bastion_PublicIP_AllocationMethod="Static"
 
-BastionName="bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-BastionSKU="Standard"
-
-
-VMSS_Name="vmss-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-VMSS_Image=Ubuntu2204
-VMSS_Upgrade_Policy=automatic
-VMSS_Admin_UserName=azureuser
-VMSS_Instance_Count=2
-VMSS_SKU=B2als_v2
-VMSS_Bakend_PoolName=APPGW_Backend_Pool
-VMSS_APPGW=$APPGW_Name
 
 
 APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
@@ -166,7 +150,7 @@ az network vnet subnet update \
   --network-security-group $NSG_Name
 ```
 
-##### Create the App GW NSG Rules
+##### Create the App GW NSG Rules - Manual at a later stage
 
 | Rule Type | Direction | Source | Destination | Protocol | Port(s) | Purpose |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -193,10 +177,10 @@ az network vnet subnet update \
   --resource-group $RGName \
   --vnet-name $VNet_name \
   --name $WEB_Subnet_Name \
-  --network-security-group $NSG_Name
+  --network-security-group $NSG_Web_Name
 ```
 
-##### Create the Web NSG Rules
+##### Create the Web NSG Rules - Manual at a later stage
 
 | Field | Configuration | Notes |
 | :--- | :--- | :--- |
@@ -209,7 +193,66 @@ az network vnet subnet update \
 | **Priority** | A lower number (e.g., `100` or `110`) | Ensure this rule has a higher priority than the default "Deny all inbound" rule you should also have. |
 
 
+##### Create the APP Subnet NSG
+```bash
+# Variables
+NSG_App_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
 
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_App_Name
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_name \
+  --name $WEB_Subnet_Name \
+  --network-security-group $NSG_App_Name
+```
+
+
+##### Create the APP NSG Rules - Manual at a later stage
+
+| Setting | Value | Explanation |
+| :--- | :--- | :--- |
+| **Direction** | **Inbound** | The traffic is coming *into* the App Subnet. |
+| **Source** | **IP Addresses / CIDR ranges** (or **VirtualNetwork** and then a specific subnet) | This should be the **CIDR range of the Web Subnet** (e.g., `10.0.1.0/24`). Specifying the Web Subnet's range limits access only to those web servers. |
+| **Source port ranges** | `*` (Any) | The web scale set instances will use ephemeral (random high) ports as their source port. |
+| **Destination** | `*` (Any) or **IP Addresses / CIDR ranges** | Since the rule is on the **subnet NSG**, the destination is the subnet itself, which contains the ILB and the scale set instances. You can use the **CIDR range of the App Subnet** (e.g., `10.0.2.0/24`). |
+| **Destination port ranges** | **8090** | This is the specific port the application is listening on, as required. |
+| **Protocol** | **TCP** (or `*` if the application uses UDP) | Most web/app traffic uses TCP. Use TCP unless the application is specifically running on UDP. |
+| **Action** | **Allow** | To explicitly permit the traffic. |
+| **Priority** | A number **lower than 65500** | A lower priority number (e.g., 100-300) ensures this rule is processed before any default "Deny" rules that might block inter-subnet traffic. |
+
+
+##### Create the SFTP Subnet NSG
+```bash
+# Variables
+NSG_Sftp_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_Sftp_Name
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_name \
+  --name $WEB_Subnet_Name \
+  --network-security-group $NSG_Sftp_Name
+```
+
+##### Create the SFTP NSG Rules - Manual at a later stage
+
+| Traffic | Direction | Port | Source | Destination | Action | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **App-to-DB** | Inbound | 5432 (default) | Subnet/IP range of your **Application Servers** | Subnet/IP range of the **DB Subnet** | Allow | Allows the application to connect. |
+| **HA/Internal** | Inbound & Outbound | 5432, 6432 | Subnet/IP range of the **DB Subnet** | Subnet/IP range of the **DB Subnet** | Allow | Required for internal server communication, including HA. |
+| **Azure Services** | Outbound | 443 | Subnet/IP range of the **DB Subnet** | **Service Tag: `AzureStorage`** | Allow | For automated backups and log archival. |
+| **Azure AD/Entra ID**| Outbound | 443 | Subnet/IP range of the **DB Subnet** | **Service Tag: `AzureActiveDirectory`** | Allow | Required for Microsoft Entra authentication. |
+| **General Internet**| Outbound | * | * | **Service Tag: `Internet`** | Deny | **Best practice** to prevent unauthorized data exfiltration. |
 
 
 
@@ -218,6 +261,12 @@ az network vnet subnet update \
 #### Create the Bastion Public IP
 
 ```bash
+# Variables
+BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+Bastion_PublicIP_SKU="Standard"
+Bastion_PublicIP_Tier="Regional"
+Bastion_PublicIP_AllocationMethod="Static"
+
 az network public-ip create \
   --resource-group $RGName \
   --name $BastionPublicIP_Name \
@@ -231,6 +280,10 @@ az network public-ip create \
 #### Create the Bastion Host
 
 ```bash
+# Variables
+BastionName=bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+BastionSKU=Standard
+
 az network bastion create \
   --name $BastionHostName \
   --resource-group $RGName \
@@ -255,7 +308,8 @@ az network public-ip create \
   --allocation-method $APPGW_PublicIP_AllocationMethod
 ```
 
-#### Creating the Web Frontend Application Gateway
+#### Creating the Web Frontend Application Gateway - Manual
+
 ```bash
 az network application-gateway create \
   --name $APPGW_Name \
@@ -274,11 +328,21 @@ az network application-gateway create \
 
 
 
-## Frontend Scale Set VMs Deployment
+## Frontend WEB VMs Scale Set Deployment - Manual
 
-#### Create the VM Scale Set
+#### Create the VM Scale Set - Manual
 
 ```bash
+# Variables
+VMSS_Name="vmss-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+VMSS_Image=Ubuntu2204
+VMSS_Upgrade_Policy=automatic
+VMSS_Admin_UserName=azureuser
+VMSS_Instance_Count=2
+VMSS_SKU=B2als_v2
+VMSS_Bakend_PoolName=APPGW_Backend_Pool
+VMSS_APPGW=$APPGW_Name
+
 az vmss create \
   --resource-group $RGName \
   --name $VMSS_Name \
@@ -292,17 +356,8 @@ az vmss create \
   --vm-sku $VMSS_SKU \
   --location $AzureRegion
 ```
-#### Attach a Managed Disk to Each VM in the Scale Set
-```bash
-az vmss disk attach \
-  --resource-group $RGName \
-  --vmss-name $VMSS_Name \
-  --size-gb 500 \
-  --sku StandardSSD_ZRS
-```
 
-
-#### Link the the Application GW to the the VMSS backend pool:
+#### Link the the Application GW to the the VMSS backend pool - Manual
 
 ```bash
 az network application-gateway address-pool create \
@@ -330,17 +385,20 @@ az network application-gateway rule create \
 
 
 
-## Application Virtual Machines Deployment
+## Application VMs Scale Set Deployment - Manual
 
-## Testing Connectivity to the Application VMs
+#### Create the VM Scale Set - Manual
 
-## Internal Load Balancer Deployment
+#### Create the APP Internal Load Balancer - Manual
+
+
+
+
+## Testing Connectivity to the Application VMs - Manual
 
 ## Testing Connectivity to Internal Load Balancer and Checking Proper Routing
 
-
-
-## Azure Database for PostgresSQL Deployment 
+## Azure Database for PostgresSQL Deployment - Manual
 
 
 
