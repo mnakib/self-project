@@ -6,16 +6,6 @@
 
 ```bash
 
-
-
-
-APPGW_Name="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-APPGW_SKU="WAF_v2"
-APPGW_CAPACITY=2
-APPGW_FE_PORT=80
-APPGW_HTTP_SETTINGS_COOKIE_BASED_AFFINITY="Disabled"
-APPGW_SETTINGS_PORT=80
-APPGW_SETTINGS_PROTOCOL="Http"
 ```
 
 
@@ -86,6 +76,7 @@ az network vnet subnet create \
   --name $APP_Subnet_Name \
   --address-prefix $APP_Subnet_AddressPrefix
 ```
+
 
 ##### Create the DB Subnet
 ```bash
@@ -269,6 +260,24 @@ az network vnet subnet update \
   --network-security-group $NSG_DB_Name
 ```
 
+#### Creating the Load Balancers
+
+#### Create APP Internal Load Balancer
+
+```bash
+# Variables
+APP_LB_Name=lb_app-bea-non_prod_partenaire-non_prod-ne-100
+APP_LB_SKU=Standard
+
+az network lb create \
+  --resource-group $RGName \
+  --name  $APP_LB_Name\
+  --sku $APP_LB_SKU \
+  --vnet-name $VNet_Name \
+  --subnet $APP_Subnet_Name \
+  --location $AzureRegion \
+  --public-ip-address ""
+```
 
 
 ### Deploying the Bastion Host 
@@ -332,6 +341,15 @@ az network public-ip create \
 #### Creating the Web Frontend Application Gateway - Manual
 
 ```bash
+# Variables
+APPGW_Name="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_SKU="WAF_v2"
+APPGW_CAPACITY=2
+APPGW_FE_PORT=80
+APPGW_HTTP_SETTINGS_COOKIE_BASED_AFFINITY="Disabled"
+APPGW_SETTINGS_PORT=80
+APPGW_SETTINGS_PROTOCOL="Http"
+
 az network application-gateway create \
   --name $APPGW_Name \
   --location $AzureRegion \
@@ -349,7 +367,9 @@ az network application-gateway create \
 
 
 
-## Frontend WEB VMs Scale Set Deployment - Manual
+## Resources Deployment
+
+### Frontend WEB VMs Scale Set Deployment - Manual
 
 #### Create the VM Scale Set - Manual
 
@@ -363,20 +383,8 @@ VMSS_Instance_Count=2
 VMSS_SKU=B2als_v2
 VMSS_Bakend_PoolName=APPGW_Backend_Pool
 VMSS_APPGW=$APPGW_Name
-
-az vmss create \
-  --resource-group $RGName \
-  --name $VMSS_Name \
-  --image $VMSS_Image \
-  --upgrade-policy-mode $VMSS_Upgrade_Policy \
-  --admin-username $VMSS_Admin_UserName \
-  --generate-ssh-keys \
-  --vnet-name $VNet_Name \
-  --subnet $WEB_Subnet_Name \
-  --instance-count $VMSS_Instance_Count \
-  --vm-sku $VMSS_SKU \
-  --location $AzureRegion
 ```
+
 
 #### Link the the Application GW to the the VMSS backend pool - Manual
 
@@ -402,11 +410,8 @@ az network application-gateway rule create \
 
 
 
-## Testing Connectivity to Application Gateway and Checking Proper Routing
-
-
-
 ## Application VMs Scale Set Deployment - Manual
+
 
 #### Create the VM Scale Set - Manual
 
