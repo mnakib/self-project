@@ -40,19 +40,13 @@ APPGW_SETTINGS_PROTOCOL="Http"
 
 
 ### Creating the Resource Group
+```bash
+# Variables
+RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
+AzureRegion="westeurope"
 
-<details>
-  <summary>Click to reveal</summary>
-  ```bash
-  # Variables
-  RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
-  AzureRegion="westeurope"
-
-  az group create --name $RGName --location $AzureRegion
-  ```
-</details>
-
-
+az group create --name $RGName --location $AzureRegion
+```
 
 ### Creating the Virtual Network and Subnets
 
@@ -153,9 +147,40 @@ az network vnet subnet create \
 
 #### Creating the NSGs
 
+##### Create the App GW Subnet NSG
 
+```bash
+# Variables
+NSG_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_Name
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_name \
+  --name $WEB_Subnet_Name \
+  --network-security-group $NSG_Name
+```
+
+##### Create the App GW NSG Rules
+
+| Rule Type | Direction | Source | Destination | Protocol | Port(s) | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Azure Management** | Inbound | `GatewayManager` Service Tag | Any | TCP | **v1: 65503-65534**<br>**v2: 65200-65535** | Required for the Azure platform to manage the gateway. |
+| **Client Traffic** | Inbound | `Internet` (or restricted IPs) | Any | TCP | **80, 443** (Your Listeners) | Allows web clients to reach the Application Gateway. |
+| **Backend Communication** | Outbound | Any | **Backend Subnet CIDR** | TCP | **80, 443** (or custom port) | Allows the gateway to send traffic to the backend VMs. |
+| **Internet Egress** | Outbound | Any | `Internet` Service Tag | Any | Any | **Required for v2 SKU** for various operational needs (e.g., CRL checks, updates). You **cannot** block all outbound internet access. |
+| **Health Probes** | Inbound | `AzureLoadBalancer` Service Tag | Any | Any | Any | Ensures internal load balancer traffic (like health probes) is allowed. |
+
+##### Create the App GW Subnet NSG Rule
 
 ##### Create the WEB Subnet NSG
+
+
 
 ```bash
 # Variables
