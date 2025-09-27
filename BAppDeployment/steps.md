@@ -8,10 +8,6 @@
 
 
 
-APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-APPGW_PublicIP_SKU="Standard"
-APPGW_PublicIP_Tier="Regional"
-APPGW_PublicIP_AllocationMethod="Static"
 
 APPGW_Name="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 APPGW_SKU="WAF_v2"
@@ -113,8 +109,8 @@ SFTP_Subnet_AddressPrefix=10.5.5.0/24
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
-  --name $DB_Subnet_Name \
-  --address-prefix $DB_Subnet_AddressPrefix
+  --name $SFTP_Subnet_Name \
+  --address-prefix $SFTP_Subnet_AddressPrefix
 ```
 
 ##### Create the Bastion Host Subnet
@@ -139,15 +135,15 @@ NSG_AppGW_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM
 
 # Create the NSG
 az network nsg create \
-  --resource-group $NSG_AppGW_Name \
-  --name $NSG_Name
+  --resource-group $RGName \
+  --name $NSG_AppGW_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
   --resource-group $RGName \
-  --vnet-name $VNet_name \
-  --name $WEB_Subnet_Name \
-  --network-security-group $NSG_Name
+  --vnet-name $VNet_Name \
+  --name $APPGW_Subnet_Name \
+  --network-security-group $NSG_AppGW_Name
 ```
 
 ##### Create the App GW NSG Rules - Manual at a later stage
@@ -175,7 +171,7 @@ az network nsg create \
 # Associate the NSG with the subnet
 az network vnet subnet update \
   --resource-group $RGName \
-  --vnet-name $VNet_name \
+  --vnet-name $VNet_Name \
   --name $WEB_Subnet_Name \
   --network-security-group $NSG_Web_Name
 ```
@@ -206,8 +202,8 @@ az network nsg create \
 # Associate the NSG with the subnet
 az network vnet subnet update \
   --resource-group $RGName \
-  --vnet-name $VNet_name \
-  --name $WEB_Subnet_Name \
+  --vnet-name $VNet_Name \
+  --name $APP_Subnet_Name \
   --network-security-group $NSG_App_Name
 ```
 
@@ -229,7 +225,7 @@ az network vnet subnet update \
 ##### Create the SFTP Subnet NSG
 ```bash
 # Variables
-NSG_Sftp_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+NSG_Sftp_Name=nsg_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
 
 # Create the NSG
 az network nsg create \
@@ -239,8 +235,8 @@ az network nsg create \
 # Associate the NSG with the subnet
 az network vnet subnet update \
   --resource-group $RGName \
-  --vnet-name $VNet_name \
-  --name $WEB_Subnet_Name \
+  --vnet-name $VNet_Name \
+  --name $SFTP_Subnet_Name \
   --network-security-group $NSG_Sftp_Name
 ```
 
@@ -253,6 +249,25 @@ az network vnet subnet update \
 | **Azure Services** | Outbound | 443 | Subnet/IP range of the **DB Subnet** | **Service Tag: `AzureStorage`** | Allow | For automated backups and log archival. |
 | **Azure AD/Entra ID**| Outbound | 443 | Subnet/IP range of the **DB Subnet** | **Service Tag: `AzureActiveDirectory`** | Allow | Required for Microsoft Entra authentication. |
 | **General Internet**| Outbound | * | * | **Service Tag: `Internet`** | Deny | **Best practice** to prevent unauthorized data exfiltration. |
+
+
+##### Create the DB Subnet NSG
+```bash
+# Variables
+NSG_DB_Name=nsg_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+
+# Create the NSG
+az network nsg create \
+  --resource-group $RGName \
+  --name $NSG_DB_Name
+
+# Associate the NSG with the subnet
+az network vnet subnet update \
+  --resource-group $RGName \
+  --vnet-name $VNet_Name \
+  --name $DB_Subnet_Name \
+  --network-security-group $NSG_DB_Name
+```
 
 
 
@@ -299,9 +314,15 @@ az network bastion create \
 
 #### Create the Application Gateway Public IP
 ```bash
+# Variables
+APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_PublicIP_SKU="Standard"
+APPGW_PublicIP_Tier="Regional"
+APPGW_PublicIP_AllocationMethod="Static"
+
 az network public-ip create \
   --resource-group $RGName \
-  --name $APPGWPublicIPName \
+  --name $APPGW_PublicIP_Name \
   --location $AzureRegion \
   --sku $APPGW_PublicIP_SKU \
   --tier $APPGW_PublicIP_Tier \
