@@ -5,15 +5,6 @@
 ### Setting the Resources Names
 
 ```bash
-
-
-
-
-
-
- 
-
-
 BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 Bastion_PublicIP_SKU="Standard"
 Bastion_PublicIP_Tier="Regional"
@@ -33,12 +24,6 @@ VMSS_Bakend_PoolName=APPGW_Backend_Pool
 VMSS_APPGW=$APPGW_Name
 
 
-
-
-
-
-
-
 APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 APPGW_PublicIP_SKU="Standard"
 APPGW_PublicIP_Tier="Regional"
@@ -56,13 +41,18 @@ APPGW_SETTINGS_PROTOCOL="Http"
 
 ### Creating the Resource Group
 
-```bash
-# Variables
-RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
-AzureRegion="westeurope"
+<details>
+  <summary>Click to reveal</summary>
+  ```bash
+  # Variables
+  RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
+  AzureRegion="westeurope"
 
-az group create --name $RGName --location $AzureRegion
-```
+  az group create --name $RGName --location $AzureRegion
+  ```
+</details>
+
+
 
 ### Creating the Virtual Network and Subnets
 
