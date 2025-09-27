@@ -9,11 +9,7 @@
 
 
 
-SFTP_Subnet_Name="snet_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
 
-
-SFTP_Subnet_AddressPrefix=10.5.5.0/24
-BASTION_Subnet_AddressPrefix="10.5.10.0/24"
 
  
 
@@ -142,6 +138,10 @@ az network vnet subnet create \
 
 ##### Create the SFTP Subnet
 ```bash
+# Variables
+SFTP_Subnet_Name="snet_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+SFTP_Subnet_AddressPrefix=10.5.5.0/24
+
 az network vnet subnet create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
@@ -149,7 +149,21 @@ az network vnet subnet create \
   --address-prefix $DB_Subnet_AddressPrefix
 ```
 
-### Create the Web Subnet NSG
+##### Create the Bastion Host Subnet
+```bash
+# Variables
+BASTION_Subnet_AddressPrefix="10.5.10.0/24"
+
+az network vnet subnet create \
+  --resource-group $RGName \
+  --vnet-name $VNet_Name \
+  --name AzureBastionSubnet \
+  --address-prefix $BASTION_Subnet_AddressPrefix
+```
+
+#### Creating the NSGs
+
+##### Create the Web Subnet NSG
 
 ```bash
 # Variables
@@ -185,14 +199,7 @@ az network vnet subnet update \
 
 
 
-##### Create the Bastion Host Subnet
-```bash
-az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name AzureBastionSubnet \
-  --address-prefix $BASTION_Subnet_AddressPrefix
-```
+
 
 
 ### Deploying the Bastion Host 
