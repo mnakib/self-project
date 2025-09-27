@@ -151,11 +151,11 @@ az network vnet subnet create \
 
 ```bash
 # Variables
-NSG_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+NSG_AppGW_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
+  --resource-group $NSG_AppGW_Name \
   --name $NSG_Name
 
 # Associate the NSG with the subnet
@@ -176,24 +176,17 @@ az network vnet subnet update \
 | **Internet Egress** | Outbound | Any | `Internet` Service Tag | Any | Any | **Required for v2 SKU** for various operational needs (e.g., CRL checks, updates). You **cannot** block all outbound internet access. |
 | **Health Probes** | Inbound | `AzureLoadBalancer` Service Tag | Any | Any | Any | Ensures internal load balancer traffic (like health probes) is allowed. |
 
-##### Create the App GW Subnet NSG Rule
 
 ##### Create the WEB Subnet NSG
 
-
-
 ```bash
 # Variables
-NSG_Name=nsg_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
-NSGRule_Name="AllowHTTPFromApplicationGW"
-NSG_RulePriority=200
-NSG_RuleSourceSubnet=$(APPGW_Subnet_Name)
-NSG_Rule_Destination_Ports=80
+NSG_Web_Name=nsg_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
 
 # Create the NSG
 az network nsg create \
   --resource-group $RGName \
-  --name $NSG_Name
+  --name $NSG_Web_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
@@ -201,19 +194,22 @@ az network vnet subnet update \
   --vnet-name $VNet_name \
   --name $WEB_Subnet_Name \
   --network-security-group $NSG_Name
-
-# Create the NSG rule to allow HTTP from the specific subnet
-az network nsg rule create \
-  --resource-group $RGName \
-  --nsg-name $NSG_Name \
-  --name $NSGRule_Name \
-  --priority $NSG_RulePriority \
-  --direction Inbound \
-  --access Allow \
-  --protocol Tcp \
-  --source-address-prefixes $NSG_RuleSourceSubnet \
-  --destination-port-ranges NSG_Rule_Destination_Ports
 ```
+
+##### Create the Web NSG Rules
+
+| Field | Configuration | Notes |
+| :--- | :--- | :--- |
+| **Source** | **IP Addresses** or **CIDR range** of the Application Gateway Subnet | This is the most critical step. The traffic originates from the Application Gateway's **internal (private) IP addresses**, which are within the range of its dedicated subnet. |
+| **Source Port Ranges** | `*` (Any) | The Application Gateway uses dynamic source ports. |
+| **Destination** | `Any` or **Application Security Group (ASG)** | If you use an ASG that contains your Web VM's NIC, it's a more flexible and robust solution than specifying individual VM IPs. |
+| **Destination Port Ranges** | **`80`** (for HTTP) and/or **`443`** (for HTTPS) | This is the port your web application is listening on. If using end-to-end TLS, this will typically be `443`. |
+| **Protocol** | **`TCP`** | Web traffic (HTTP/HTTPS) uses TCP. |
+| **Action** | **`Allow`** | |
+| **Priority** | A lower number (e.g., `100` or `110`) | Ensure this rule has a higher priority than the default "Deny all inbound" rule you should also have. |
+
+
+
 
 
 
