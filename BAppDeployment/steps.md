@@ -132,7 +132,7 @@ az network vnet subnet create \
 
 #### Creating the NSGs
 
-##### Create the App GW Subnet NSG
+##### Create the App GW Subnet NSG ==> SKIP <==
 
 ```bash
 # Variables			
@@ -166,6 +166,8 @@ az network vnet subnet update \
 
 ```bash
 NSG_Web_Name=nsg-web-bea-$ENV-beyn-$ENV-ne-$Random_Number
+WEB_Subnet_Name=sub-web-bea-$ENV-beyn-$ENV-ne-$Random_Number
+
 
 # Create the NSG
 az network nsg create \
@@ -197,6 +199,8 @@ az network vnet subnet update \
 ```bash
 # Variables			
 NSG_App_Name=nsg-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
+APP_Subnet_Name=sub-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
+
 
 # Create the NSG
 az network nsg create \
