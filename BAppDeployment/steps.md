@@ -12,9 +12,10 @@
 ### Creating the Resource Group
 ```bash
 # Variables			
-Random_Number=$(echo $((100 + RANDOM % 1)))	
-RGName=rg-bea-nonprod-beyn-nonprod-ne-$Random_Number
-AzureRegion=westeurope	
+Random_Number=$(echo $((100 + RANDOM % 1)))
+ENV=nonprod
+RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
+AzureRegion=westeurope
 
 az group create --name $RGName --location $AzureRegion
 ```
