@@ -11,9 +11,10 @@
 
 ### Creating the Resource Group
 ```bash
-# Variables
-RGName="rg-bea-non_prod_partenaire-non_prod-ne-$(echo $((100 + RANDOM % 1)))"
-AzureRegion="westeurope"
+# Variables			
+Random_Number=$(echo $((100 + RANDOM % 1)))	
+RGName=rg-bea-nonprod-beyn-nonprod-ne-$Random_Number
+AzureRegion=westeurope	
 
 az group create --name $RGName --location $AzureRegion
 ```
@@ -23,14 +24,18 @@ az group create --name $RGName --location $AzureRegion
 #### Create the Virtual Network
 
 ```bash
-# Variables
-VNet_Name="vnet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-VNet_AddressPrefix="10.5.0.0/20"
+# Variables			
+VNet_Name=vnet-bea-nonprod-beyn-nonprod-ne-$Random_Number
+VNet_AddressPrefix=10.5.0.0/20
+
+# Register the Network Provider
+az provider register --namespace Microsoft.Network
+
 
 az network vnet create \
-  --resource-group $RGName \
-  --name $VNet_Name \
-  --address-prefix $VNet_AddressPrefix
+--resource-group $RGName \
+--name $VNet_Name \
+--address-prefix $VNet_AddressPrefix
 ```
 
 #### Creating the Subnets
@@ -38,82 +43,82 @@ az network vnet create \
 ##### Create the Application Gateway subnet
 
 ```bash
-# Variables
-APPGW_Subnet_Name="sub_agw_snet-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+# Variables			
+APPGW_Subnet_Name=sub-agw-bea-nonprod-beyn-nonprod-ne-$Random_Number
 APPGW_Subnet_AddressPrefix=10.5.1.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $APPGW_Subnet_Name \
-  --address-prefix $APPGW_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $APPGW_Subnet_Name \
+--address-prefix $APPGW_Subnet_AddressPrefix
 ```
 
 
 ##### Create the WEB Subnet
 ```bash
-# Variables
-WEB_Subnet_Name="sub_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+# Variables			
+WEB_Subnet_Name=sub-web-bea-nonprod-beyn-nonprod-ne-$Random_Number
 WEB_Subnet_AddressPrefix=10.5.2.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $WEB_Subnet_Name \
-  --address-prefix $WEB_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $WEB_Subnet_Name \
+--address-prefix $WEB_Subnet_AddressPrefix
 ```
 
 
 ##### Create the APP Subnet
 ```bash
-# Variables
-APP_Subnet_Name="sub_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+# Variables			
+APP_Subnet_Name=sub-app-bea-non-prod-beyn-nonprod-ne-$Random_Number
 APP_Subnet_AddressPrefix=10.5.3.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $APP_Subnet_Name \
-  --address-prefix $APP_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $APP_Subnet_Name \
+--address-prefix $APP_Subnet_AddressPrefix
 ```
 
 
 ##### Create the DB Subnet
 ```bash
-# Variables
-DB_Subnet_Name="sub_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+# Variables			
+DB_Subnet_Name=sub-db-bea-nonprod-beyn-nonprod-ne-$Random_Number
 DB_Subnet_AddressPrefix=10.5.4.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $DB_Subnet_Name \
-  --address-prefix $DB_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $DB_Subnet_Name \
+--address-prefix $DB_Subnet_AddressPrefix
 ```
 
 ##### Create the SFTP Subnet
 ```bash
-# Variables
-SFTP_Subnet_Name="sub_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+# Variables			
+SFTP_Subnet_Name=sub-sftp-bea-nonprod-beyn-nonprod-ne-$Random_Number
 SFTP_Subnet_AddressPrefix=10.5.5.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $SFTP_Subnet_Name \
-  --address-prefix $SFTP_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $SFTP_Subnet_Name \
+--address-prefix $SFTP_Subnet_AddressPrefix
 ```
 
 ##### Create the Bastion Host Subnet
 ```bash
-# Variables
-BASTION_Subnet_AddressPrefix="10.5.10.0/24"
+# Variables		
+BASTION_Subnet_AddressPrefix=10.5.10.0/24
 
 az network vnet subnet create \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name AzureBastionSubnet \
-  --address-prefix $BASTION_Subnet_AddressPrefix
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name AzureBastionSubnet \
+--address-prefix $BASTION_Subnet_AddressPrefix
 ```
 
 #### Creating the NSGs
@@ -121,20 +126,20 @@ az network vnet subnet create \
 ##### Create the App GW Subnet NSG
 
 ```bash
-# Variables
-NSG_AppGW_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+# Variables			
+NSG_AppGW_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_AppGW_Name
+--resource-group $RGName \
+--name $NSG_AppGW_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $APPGW_Subnet_Name \
-  --network-security-group $NSG_AppGW_Name
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $APPGW_Subnet_Name \
+--network-security-group $NSG_AppGW_Name
 ```
 
 ##### Create the App GW NSG Rules - Manual at a later stage
@@ -151,20 +156,19 @@ az network vnet subnet update \
 ##### Create the WEB Subnet NSG
 
 ```bash
-# Variables
-NSG_Web_Name=nsg_web-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+NSG_Web_Name=nsg_web-bea-non_prod_partenaire-nonprod-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_Web_Name
+--resource-group $RGName \
+--name $NSG_Web_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $WEB_Subnet_Name \
-  --network-security-group $NSG_Web_Name
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $WEB_Subnet_Name \
+--network-security-group $NSG_Web_Name
 ```
 
 ##### Create the Web NSG Rules - Manual at a later stage
@@ -182,20 +186,20 @@ az network vnet subnet update \
 
 ##### Create the APP Subnet NSG
 ```bash
-# Variables
-NSG_App_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+# Variables			
+NSG_App_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_App_Name
+--resource-group $RGName \
+--name $NSG_App_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $APP_Subnet_Name \
-  --network-security-group $NSG_App_Name
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $APP_Subnet_Name \
+--network-security-group $NSG_App_Name
 ```
 
 
@@ -215,20 +219,20 @@ az network vnet subnet update \
 
 ##### Create the SFTP Subnet NSG
 ```bash
-# Variables
-NSG_Sftp_Name=nsg_sftp-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+# Variables			
+NSG_Sftp_Name=nsg_sftp-bea-non_prod_partenaire-nonprod-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_Sftp_Name
+--resource-group $RGName \
+--name $NSG_Sftp_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $SFTP_Subnet_Name \
-  --network-security-group $NSG_Sftp_Name
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $SFTP_Subnet_Name \
+--network-security-group $NSG_Sftp_Name
 ```
 
 ##### Create the SFTP NSG Rules - Manual at a later stage
@@ -244,20 +248,20 @@ az network vnet subnet update \
 
 ##### Create the DB Subnet NSG
 ```bash
-# Variables
-NSG_DB_Name=nsg_db-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+# Variables			
+NSG_DB_Name=nsg_db-bea-non_prod_partenaire-nonprod-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
-  --resource-group $RGName \
-  --name $NSG_DB_Name
+--resource-group $RGName \
+--name $NSG_DB_Name
 
 # Associate the NSG with the subnet
 az network vnet subnet update \
-  --resource-group $RGName \
-  --vnet-name $VNet_Name \
-  --name $DB_Subnet_Name \
-  --network-security-group $NSG_DB_Name
+--resource-group $RGName \
+--vnet-name $VNet_Name \
+--name $DB_Subnet_Name \
+--network-security-group $NSG_DB_Name
 ```
 
 #### Creating the Load Balancers
