@@ -16,8 +16,9 @@ Random_Number=$(echo $((100 + RANDOM % 1)))
 ENV=nonprod
 RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 AzureRegion=westeurope
+Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
 
-az group create --name $RGName --location $AzureRegion
+az group create --name $RGName --location $AzureRegion --subscription $Subscription_ID
 ```
 
 ### Creating the Virtual Network and Subnets
