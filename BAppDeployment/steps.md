@@ -26,7 +26,7 @@ az group create --name $RGName --location $AzureRegion
 
 ```bash
 # Variables			
-VNet_Name=vnet-bea-nonprod-beyn-nonprod-ne-$Random_Number
+VNet_Name=vnet-bea-$ENV-beyn-$ENV-ne-$Random_Number
 VNet_AddressPrefix=10.5.0.0/20
 
 # Register the Network Provider
@@ -45,7 +45,7 @@ az network vnet create \
 
 ```bash
 # Variables			
-APPGW_Subnet_Name=sub-agw-bea-nonprod-beyn-nonprod-ne-$Random_Number
+APPGW_Subnet_Name=sub-agw-bea-$ENV-beyn-$ENV-ne-$Random_Number
 APPGW_Subnet_AddressPrefix=10.5.1.0/24
 
 az network vnet subnet create \
@@ -59,7 +59,7 @@ az network vnet subnet create \
 ##### Create the WEB Subnet
 ```bash
 # Variables			
-WEB_Subnet_Name=sub-web-bea-nonprod-beyn-nonprod-ne-$Random_Number
+WEB_Subnet_Name=sub-web-bea-$ENV-beyn-$ENV-ne-$Random_Number
 WEB_Subnet_AddressPrefix=10.5.2.0/24
 
 az network vnet subnet create \
@@ -73,7 +73,7 @@ az network vnet subnet create \
 ##### Create the APP Subnet
 ```bash
 # Variables			
-APP_Subnet_Name=sub-app-bea-non-prod-beyn-nonprod-ne-$Random_Number
+APP_Subnet_Name=sub-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
 APP_Subnet_AddressPrefix=10.5.3.0/24
 
 az network vnet subnet create \
@@ -87,7 +87,7 @@ az network vnet subnet create \
 ##### Create the DB Subnet
 ```bash
 # Variables			
-DB_Subnet_Name=sub-db-bea-nonprod-beyn-nonprod-ne-$Random_Number
+DB_Subnet_Name=sub-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
 DB_Subnet_AddressPrefix=10.5.4.0/24
 
 az network vnet subnet create \
@@ -100,7 +100,7 @@ az network vnet subnet create \
 ##### Create the SFTP Subnet
 ```bash
 # Variables			
-SFTP_Subnet_Name=sub-sftp-bea-nonprod-beyn-nonprod-ne-$Random_Number
+SFTP_Subnet_Name=sub-sftp-bea-$ENV-beyn-$ENV-ne-$Random_Number
 SFTP_Subnet_AddressPrefix=10.5.5.0/24
 
 az network vnet subnet create \
@@ -128,7 +128,7 @@ az network vnet subnet create \
 
 ```bash
 # Variables			
-NSG_AppGW_Name=nsg_azg-bea-non_prod_partenaire-nonprod-ne-$Random_Number
+NSG_AppGW_Name=nsg_azg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -157,7 +157,7 @@ az network vnet subnet update \
 ##### Create the WEB Subnet NSG
 
 ```bash
-NSG_Web_Name=nsg_web-bea-non_prod_partenaire-nonprod-ne-$Random_Number
+NSG_Web_Name=nsg-web-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -188,7 +188,7 @@ az network vnet subnet update \
 ##### Create the APP Subnet NSG
 ```bash
 # Variables			
-NSG_App_Name=nsg_app-bea-non_prod_partenaire-nonprod-ne-$Random_Number
+NSG_App_Name=nsg-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -221,7 +221,7 @@ az network vnet subnet update \
 ##### Create the SFTP Subnet NSG
 ```bash
 # Variables			
-NSG_Sftp_Name=nsg_sftp-bea-non_prod_partenaire-nonprod-ne-$Random_Number
+NSG_Sftp_Name=nsg-sftp-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -250,7 +250,7 @@ az network vnet subnet update \
 ##### Create the DB Subnet NSG
 ```bash
 # Variables			
-NSG_DB_Name=nsg_db-bea-non_prod_partenaire-nonprod-ne-$Random_Number
+NSG_DB_Name=nsg-db-bea-$ENV-partenaire-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
