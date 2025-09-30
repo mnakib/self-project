@@ -11,8 +11,10 @@
 ### Set the Default Subscription
 
 ```bash
+# Variables
 Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
 
+# Set the default subscription
 az account set --subscription $Subscription_ID
 ```
 
@@ -344,8 +346,8 @@ az network bastion create \
 ```bash
 # Variables
 APPGW_PublicIP_Name=app-agw-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
-APPGW_PublicIP_SKU="Standard"
-APPGW_PublicIP_Tier="Regional"
+APPGW_PublicIP_SKU=Standard
+APPGW_PublicIP_Tier=Regional
 APPGW_PublicIP_AllocationMethod="Static"
 
 az network public-ip create \
@@ -387,10 +389,12 @@ az network application-gateway create \
 
 ## SSH Keys Creation - Create manually
 
+```bash
+# Variables
 WEB_SSH_Key_Name=web-ssh-key-bea-prod-beyn-prod-ne-100
 APP_SSH_Key_Name=app-ssh-key-bea-prod-beyn-prod-ne-100
 SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
-
+```
 
 
 
@@ -399,7 +403,7 @@ SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
 
 ## Create the Key Vault
 # Variables		
-KeyVaultName=key-vault-bea-$ENV-beyn-$ENV-ne
+KeyVaultName=kvault-bea-nonprod-beyn1
 AzureRegion=westeurope
 
 az keyvault create --name $KeyVaultName \
@@ -418,11 +422,42 @@ My_Public_IP_Address=		$(echo $(curl -s -4 ipinfo.io/ip))
 az role assignment create --role $Vault_Role \
 --assignee $AzureADObjectId \
 --scope /subscriptions/$SubID/resourceGroups/$RGName/providers/Microsoft.KeyVault/vaults/$Vault_Name
-
-
 ```
 
 
+## NAT Gateway Creation
+#### Create the NAT Gateway Public IP
+```bash
+# Variables
+NAT_GW_PublicIP_Name=natgw-pub-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
+NAT_GW_PublicIP_SKU=Standard
+NAT_GW_PublicIP_Tier=Regional
+NAT_GW_PublicIP_AllocationMethod="Static"
+
+# Create the NAT Gateway Public IP
+az network public-ip create \
+  --resource-group $RGName \
+  --name $NAT_GW_PublicIP_Name \
+  --location $AzureRegion \
+  --sku $NAT_GW_PublicIP_SKU \
+  --tier $NAT_GW_PublicIP_Tier \
+  --allocation-method $NAT_GW_PublicIP_AllocationMethod
+```
+
+#### Create the NAT Gateway
+```bash
+
+# Variables
+NAT_GW_Name=natgw-bea-$ENV-beyn-$ENV-ne-$Random_Number
+NAT_GW_Name_SKU=Standard
+
+az network nat gateway create \
+  --resource-group $RGName \
+  --name $NAT_GW_Name \
+  --location $AzureRegion \
+  --public-ip-addresses $NAT_GW_PublicIP_Name \
+  --sku Standard
+```
 
 
 
