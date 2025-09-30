@@ -128,7 +128,7 @@ az network vnet subnet create \
 
 ```bash
 # Variables			
-NSG_AppGW_Name=nsg_azg-bea-$ENV-beyn-$ENV-ne-$Random_Number
+NSG_AppGW_Name=nsg-azg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -222,6 +222,7 @@ az network vnet subnet update \
 ```bash
 # Variables			
 NSG_Sftp_Name=nsg-sftp-bea-$ENV-beyn-$ENV-ne-$Random_Number
+SFTP_Subnet_Name=sub-sftp-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -251,6 +252,7 @@ az network vnet subnet update \
 ```bash
 # Variables			
 NSG_DB_Name=nsg-db-bea-$ENV-partenaire-$ENV-ne-$Random_Number
+DB_Subnet_Name=sub-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
 az network nsg create \
@@ -271,7 +273,7 @@ az network vnet subnet update \
 
 ```bash
 # Variables
-APP_LB_Name=lb_app-bea-non_prod_partenaire-non_prod-ne-100
+APP_LB_Name=lb-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
 APP_LB_SKU=Standard
 
 az network lb create \
@@ -291,10 +293,10 @@ az network lb create \
 
 ```bash
 # Variables
-BastionPublicIP_Name="bst_host_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
-Bastion_PublicIP_SKU="Standard"
-Bastion_PublicIP_Tier="Regional"
-Bastion_PublicIP_AllocationMethod="Static"
+BastionPublicIP_Name=bst-pub-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
+Bastion_PublicIP_SKU=Standard
+Bastion_PublicIP_Tier=Regional
+Bastion_PublicIP_AllocationMethod=Static
 
 az network public-ip create \
   --resource-group $RGName \
@@ -310,7 +312,7 @@ az network public-ip create \
 
 ```bash
 # Variables
-BastionName=bst_host-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))
+BastionHostName=bst-host-bea-$ENV-beyn-$ENV-ne-$Random_Number
 BastionSKU=Standard
 
 az network bastion create \
@@ -318,7 +320,7 @@ az network bastion create \
   --resource-group $RGName \
   --vnet-name $VNet_Name \
   --location $AzureRegion \
-  --public-ip-address $BastionPublicIPName \
+  --public-ip-address $BastionPublicIP_Name \
   --sku $BastionSKU
 ```
 
@@ -329,7 +331,7 @@ az network bastion create \
 #### Create the Application Gateway Public IP
 ```bash
 # Variables
-APPGW_PublicIP_Name="app_gw_ip-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_PublicIP_Name=app-agw-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
 APPGW_PublicIP_SKU="Standard"
 APPGW_PublicIP_Tier="Regional"
 APPGW_PublicIP_AllocationMethod="Static"
@@ -369,6 +371,46 @@ az network application-gateway create \
   --subnet $APPGW_Subnet_Name \
   --public-ip-address $APPGWPublic_IPName
 ```
+
+
+## SSH Keys Creation - Create manually
+
+WEB_SSH_Key_Name=web-ssh-key-bea-prod-beyn-prod-ne-100
+APP_SSH_Key_Name=app-ssh-key-bea-prod-beyn-prod-ne-100
+SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
+
+
+
+
+## Key Vault Creation
+```bash
+
+## Create the Key Vault
+# Variables		
+KeyVaultName=key-vault-bea-$ENV-beyn-$ENV-ne
+AzureRegion=westeurope
+
+az keyvault create --name $KeyVaultName \
+--resource-group $RGName \
+--location $AzureRegion
+
+## Configure Key Vault RBAC
+# Variables	
+Vault_Role	=	"Key Vault Secrets Officer"
+AzureADObjectId	=	m.nakib-ext@bea-international.fr
+SubID	=	23d2cf3f-c98e-44c5-8cca-52cc13acad13
+RGName	=	$RGName
+Vault_Name	=	bea-key-vault-non-prod
+My_Public_IP_Address=		$(echo $(curl -s -4 ipinfo.io/ip))
+
+az role assignment create --role $Vault_Role \
+--assignee $AzureADObjectId \
+--scope /subscriptions/$SubID/resourceGroups/$RGName/providers/Microsoft.KeyVault/vaults/$Vault_Name
+
+
+```
+
+
 
 
 
