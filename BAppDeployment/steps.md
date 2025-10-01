@@ -391,11 +391,17 @@ az network application-gateway create \
 
 ```bash
 # Variables
-WEB_SSH_Key_Name=web-ssh-key-bea-prod-beyn-prod-ne-100
-APP_SSH_Key_Name=app-ssh-key-bea-prod-beyn-prod-ne-100
-SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
+WEB_SSH_Key_Name=web-ssh-key-bea-nonprod-beyn-nonprod-ne-100
+APP_SSH_Key_Name=app-ssh-key-bea-nonprod-beyn-nonprod-ne-100
+SFTP_SSH_Key_Name=sftp-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 ```
 
+
+## Managed Identities Creation
+```bash
+DB_Managed_Identity_Name=db-mgd-id-bea-prod-beyn-prod-ne-100
+
+```
 
 
 ## Key Vault Creation
