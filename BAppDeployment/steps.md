@@ -264,8 +264,13 @@ az network vnet subnet update \
 
 ##### Create the DB Subnet NSG
 ```bash
-# Variables			
-NSG_DB_Name=nsg-db-bea-$ENV-partenaire-$ENV-ne-$Random_Number
+# Variables
+Random_Number=$(echo $((100 + RANDOM % 1)))
+RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
+AzureRegion=westeurope
+		
+NSG_DB_Name=nsg-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
+VNet_Name=vnet-bea-$ENV-beyn-$ENV-ne-$Random_Number
 DB_Subnet_Name=sub-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
 
 # Create the NSG
@@ -399,22 +404,47 @@ SFTP_SSH_Key_Name=sftp-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 
 ## Managed Identities Creation
 ```bash
-DB_Managed_Identity_Name=db-mgd-id-bea-prod-beyn-prod-ne-100
-
+DB_Managed_Identity_Name=db-mgd-id-bea-nonprod-beyn-nonprod-ne-100
 ```
 
 
 ## Key Vault Creation
 ```bash
-
-## Create the Key Vault
+## Create the Key Vaults
 # Variables		
-KeyVaultName=kvault-bea-nonprod-beyn1
+KeyVaultWEB_Name=kvwebnprdbeynne
+KeyVaultAPP_Name=kvappnprdbeynne
+KeyVaultSFTP_Name=kvsftpnprdbeynne
+KeyVaultDB_Name=kvdbnprdbeynne
+
 AzureRegion=westeurope
 
-az keyvault create --name $KeyVaultName \
+# Create the WEB Key Vault
+az keyvault create --name $KeyVaultWEB_Name \
 --resource-group $RGName \
 --location $AzureRegion
+
+# Create the APP Key Vault
+az keyvault create --name $KeyVaultAPP_Name \
+--resource-group $RGName \
+--location $AzureRegion
+
+# Create the SFTP Key Vault
+az keyvault create --name $KeyVaultSFTP_Name \
+--resource-group $RGName \
+--location $AzureRegion
+
+# Create the DB Key Vault
+az keyvault create --name $KeyVaultDB_Name \
+--resource-group $RGName \
+--location $AzureRegion
+
+
+
+
+
+
+
 
 ## Configure Key Vault RBAC
 # Variables	
