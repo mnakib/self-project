@@ -12,7 +12,8 @@
 
 ```bash
 # Variables
-Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
+#Subscription_ID=Non-Prod-Beyn
+Subscription_ID=Prod-Beyn
 
 # Set the default subscription
 az account set --subscription $Subscription_ID
@@ -22,7 +23,8 @@ az account set --subscription $Subscription_ID
 ```bash
 # Variables			
 Random_Number=$(echo $((100 + RANDOM % 1)))
-ENV=nonprod
+#ENV=nonprod
+ENV=prod
 RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 AzureRegion=westeurope
 Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
@@ -37,7 +39,9 @@ az group create --name $RGName --location $AzureRegion --subscription $Subscript
 ```bash
 # Variables			
 VNet_Name=vnet-bea-$ENV-beyn-$ENV-ne-$Random_Number
-VNet_AddressPrefix=10.5.0.0/20
+#VNet_Second_Bit=5
+VNet_Second_Bit=6
+VNet_AddressPrefix=10.$VNet_Second_Bit.0.0/20
 
 # Register the Network Provider
 az provider register --namespace Microsoft.Network
@@ -56,7 +60,7 @@ az network vnet create \
 ```bash
 # Variables			
 APPGW_Subnet_Name=sub-agw-bea-$ENV-beyn-$ENV-ne-$Random_Number
-APPGW_Subnet_AddressPrefix=10.5.1.0/24
+APPGW_Subnet_AddressPrefix=10.$VNet_Second_Bit.1.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -70,7 +74,7 @@ az network vnet subnet create \
 ```bash
 # Variables			
 WEB_Subnet_Name=sub-web-bea-$ENV-beyn-$ENV-ne-$Random_Number
-WEB_Subnet_AddressPrefix=10.5.2.0/24
+WEB_Subnet_AddressPrefix=10.$VNet_Second_Bit.2.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -84,7 +88,7 @@ az network vnet subnet create \
 ```bash
 # Variables			
 APP_Subnet_Name=sub-app-bea-$ENV-beyn-$ENV-ne-$Random_Number
-APP_Subnet_AddressPrefix=10.5.3.0/24
+APP_Subnet_AddressPrefix=10.$VNet_Second_Bit.3.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -98,7 +102,7 @@ az network vnet subnet create \
 ```bash
 # Variables			
 DB_Subnet_Name=sub-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
-DB_Subnet_AddressPrefix=10.5.4.0/24
+DB_Subnet_AddressPrefix=10.$VNet_Second_Bit.4.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -111,7 +115,7 @@ az network vnet subnet create \
 ```bash
 # Variables			
 SFTP_Subnet_Name=sub-sftp-bea-$ENV-beyn-$ENV-ne-$Random_Number
-SFTP_Subnet_AddressPrefix=10.5.5.0/24
+SFTP_Subnet_AddressPrefix=10.$VNet_Second_Bit.5.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -123,7 +127,7 @@ az network vnet subnet create \
 ##### Create the Bastion Host Subnet
 ```bash
 # Variables		
-BASTION_Subnet_AddressPrefix=10.5.10.0/24
+BASTION_Subnet_AddressPrefix=10.$VNet_Second_Bit.10.0/24
 
 az network vnet subnet create \
 --resource-group $RGName \
@@ -133,36 +137,6 @@ az network vnet subnet create \
 ```
 
 #### Creating the NSGs
-
-##### Create the App GW Subnet NSG ==> SKIP <==
-
-```bash
-# Variables			
-NSG_AppGW_Name=nsg-azg-bea-$ENV-beyn-$ENV-ne-$Random_Number
-
-# Create the NSG
-az network nsg create \
---resource-group $RGName \
---name $NSG_AppGW_Name
-
-# Associate the NSG with the subnet
-az network vnet subnet update \
---resource-group $RGName \
---vnet-name $VNet_Name \
---name $APPGW_Subnet_Name \
---network-security-group $NSG_AppGW_Name
-```
-
-##### Create the App GW NSG Rules - Manual at a later stage
-
-| Rule Type | Direction | Source | Destination | Protocol | Port(s) | Purpose |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Azure Management** | Inbound | `GatewayManager` Service Tag | Any | TCP | **v1: 65503-65534**<br>**v2: 65200-65535** | Required for the Azure platform to manage the gateway. |
-| **Client Traffic** | Inbound | `Internet` (or restricted IPs) | Any | TCP | **80, 443** (Your Listeners) | Allows web clients to reach the Application Gateway. |
-| **Backend Communication** | Outbound | Any | **Backend Subnet CIDR** | TCP | **80, 443** (or custom port) | Allows the gateway to send traffic to the backend VMs. |
-| **Internet Egress** | Outbound | Any | `Internet` Service Tag | Any | Any | **Required for v2 SKU** for various operational needs (e.g., CRL checks, updates). You **cannot** block all outbound internet access. |
-| **Health Probes** | Inbound | `AzureLoadBalancer` Service Tag | Any | Any | Any | Ensures internal load balancer traffic (like health probes) is allowed. |
-
 
 ##### Create the WEB Subnet NSG
 
@@ -265,9 +239,9 @@ az network vnet subnet update \
 ##### Create the DB Subnet NSG
 ```bash
 # Variables
-Random_Number=$(echo $((100 + RANDOM % 1)))
-RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
-AzureRegion=westeurope
+#Random_Number=$(echo $((100 + RANDOM % 1)))
+#RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
+#AzureRegion=westeurope
 		
 NSG_DB_Name=nsg-db-bea-$ENV-beyn-$ENV-ne-$Random_Number
 VNet_Name=vnet-bea-$ENV-beyn-$ENV-ne-$Random_Number
@@ -332,7 +306,10 @@ az network public-ip create \
 ```bash
 # Variables
 BastionHostName=bst-host-bea-$ENV-beyn-$ENV-ne-$Random_Number
+# User Standard SKU for Non-Prod environment and Premium SKU for Prod environment
 BastionSKU=Standard
+#BastionSKU=Premium
+
 
 az network bastion create \
   --name $BastionHostName \
@@ -396,48 +373,89 @@ az network application-gateway create \
 
 ```bash
 # Variables
+### For Non-Prod
 WEB_SSH_Key_Name=web-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 APP_SSH_Key_Name=app-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 SFTP_SSH_Key_Name=sftp-ssh-key-bea-nonprod-beyn-nonprod-ne-100
+### For Non-Prod
+WEB_SSH_Key_Name=web-ssh-key-bea-prod-beyn-prod-ne-100
+APP_SSH_Key_Name=app-ssh-key-bea-prod-beyn-prod-ne-100
+SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
+
 ```
 
 
 ## Managed Identities Creation
 ```bash
+### For Non-Prod
+WEB_Managed_Identity_Name=web-mgd-id-bea-nonprod-beyn-nonprod-ne-100
+APP_Managed_Identity_Name=app-mgd-id-bea-nonprod-beyn-nonprod-ne-100
+SFTP_Managed_Identity_Name=sftp-mgd-id-bea-nonprod-beyn-nonprod-ne-100
 DB_Managed_Identity_Name=db-mgd-id-bea-nonprod-beyn-nonprod-ne-100
+### For Prod
+WEB_Managed_Identity_Name=web-mgd-id-bea-prod-beyn-prod-ne-100
+APP_Managed_Identity_Name=app-mgd-id-bea-prod-beyn-prod-ne-100
+SFTP_Managed_Identity_Name=sftp-mgd-id-bea-prod-beyn-prod-ne-100
+DB_Managed_Identity_Name=db-mgd-id-bea-prod-beyn-prod-ne-100
 ```
 
 
 ## Key Vault Creation
 ```bash
 ## Create the Key Vaults
-# Variables		
-KeyVaultWEB_Name=kvwebnprdbeynne
-KeyVaultAPP_Name=kvappnprdbeynne
-KeyVaultSFTP_Name=kvsftpnprdbeynne
-KeyVaultDB_Name=kvdbnprdbeynne
+# Variables
+### For Non-Prod	
+KeyVaultWEB_Name=kvltwebnprdbeynne
+KeyVaultAPP_Name=kvltappnprdbeynne
+KeyVaultSFTP_Name=kvltsftpnprdbeynne
+KeyVaultDB_Name=kvltdbnprdbeynne
+KeyVault_SKU=Premium
+### For Prod	
+KeyVaultWEB_Name=kvltwebprdbeynne
+KeyVaultAPP_Name=kvltappprdbeynne
+KeyVaultSFTP_Name=kvltsftpprdbeynne
+KeyVaultDB_Name=kvltdbprdbeynne
+KeyVault_SKU=Premium
 
-AzureRegion=westeurope
+
+# Register the Key Vault Resource Provider
+az provider register --namespace Microsoft.KeyVault
+az provider show -n Microsoft.KeyVault
 
 # Create the WEB Key Vault
 az keyvault create --name $KeyVaultWEB_Name \
 --resource-group $RGName \
---location $AzureRegion
+--location $AzureRegion \
+--sku $KeyVault_SKU \
+--enabled-for-deployment true \
+--enabled-for-disk-encryption true
 
 # Create the APP Key Vault
 az keyvault create --name $KeyVaultAPP_Name \
 --resource-group $RGName \
---location $AzureRegion
+--location $AzureRegion \
+--sku $KeyVault_SKU \
+--enabled-for-deployment true \
+--enabled-for-disk-encryption true
+
 
 # Create the SFTP Key Vault
 az keyvault create --name $KeyVaultSFTP_Name \
 --resource-group $RGName \
---location $AzureRegion
+--location $AzureRegion \
+--sku $KeyVault_SKU \
+--enabled-for-deployment true \
+--enabled-for-disk-encryption true
+
 
 # Create the DB Key Vault
 az keyvault create --name $KeyVaultDB_Name \
 --resource-group $RGName \
---location $AzureRegion
+--location $AzureRegion \
+--sku $KeyVault_SKU \
+--enabled-for-deployment true \
+--enabled-for-disk-encryption true
+
 
 
 
