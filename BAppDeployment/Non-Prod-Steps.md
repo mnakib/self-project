@@ -27,7 +27,6 @@ Random_Number=$(echo $((100 + RANDOM % 1)))
 ENV=prod
 RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 AzureRegion=northeurope
-Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
 
 az group create --name $RGName --location $AzureRegion --subscription $Subscription_ID
 ```
