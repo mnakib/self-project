@@ -389,13 +389,41 @@ SFTP_SSH_Key_Name=sftp-ssh-key-bea-prod-beyn-prod-ne-100
 ### For Non-Prod
 WEB_Managed_Identity_Name=web-mgd-id-bea-nonprod-beyn-nonprod-ne-100
 APP_Managed_Identity_Name=app-mgd-id-bea-nonprod-beyn-nonprod-ne-100
-SFTP_Managed_Identity_Name=sftp-mgd-id-bea-nonprod-beyn-nonprod-ne-100
 DB_Managed_Identity_Name=db-mgd-id-bea-nonprod-beyn-nonprod-ne-100
+SFTP_Managed_Identity_Name=sftp-mgd-id-bea-nonprod-beyn-nonprod-ne-100
+
 ### For Prod
 WEB_Managed_Identity_Name=web-mgd-id-bea-prod-beyn-prod-ne-100
 APP_Managed_Identity_Name=app-mgd-id-bea-prod-beyn-prod-ne-100
-SFTP_Managed_Identity_Name=sftp-mgd-id-bea-prod-beyn-prod-ne-100
 DB_Managed_Identity_Name=db-mgd-id-bea-prod-beyn-prod-ne-100
+SFTP_Managed_Identity_Name=sftp-mgd-id-bea-prod-beyn-prod-ne-100
+
+
+# Create the WEB Managed Identity
+az identity create \
+--resource-group $RGName \
+--name $WEB_Managed_Identity_Name \
+--location $AzureRegion
+
+# Create the APP Managed Identity
+az identity create \
+--resource-group $RGName \
+--name $APP_Managed_Identity_Name \
+--location $AzureRegion
+
+# Create the DB Managed Identity
+az identity create \
+--resource-group $RGName \
+--name $DB_Managed_Identity_Name \
+--location $AzureRegion
+
+# Create the SFTP Managed Identity
+az identity create \
+--resource-group $RGName \
+--name $SFTP_Managed_Identity_Name \
+--location $AzureRegion
+
+
 ```
 
 
