@@ -431,17 +431,20 @@ az identity create \
 ```bash
 ## Create the Key Vaults
 # Variables
+AzureRegion=northeurope
+
 ### For Non-Prod	
-KeyVaultWEB_Name=kvltwebnprdbeynne
-KeyVaultAPP_Name=kvltappnprdbeynne
-KeyVaultSFTP_Name=kvltsftpnprdbeynne
-KeyVaultDB_Name=kvltdbnprdbeynne
+KeyVaultWEB_Name=kvwebnprdbeynne
+KeyVaultAPP_Name=kvappnprdbeynne
+KeyVaultSFTP_Name=kvsftpnprdbeynne
+KeyVaultDB_Name=kvdbnprdbeynne
 KeyVault_SKU=Premium
+
 ### For Prod	
-KeyVaultWEB_Name=kvltwebprdbeynne
-KeyVaultAPP_Name=kvltappprdbeynne
-KeyVaultSFTP_Name=kvltsftpprdbeynne
-KeyVaultDB_Name=kvltdbprdbeynne
+KeyVaultWEB_Name=kvwebprdbeynne
+KeyVaultAPP_Name=kvappprdbeynne
+KeyVaultSFTP_Name=kvsftpprdbeynne
+KeyVaultDB_Name=kvdbprdbeynne
 KeyVault_SKU=Premium
 
 
