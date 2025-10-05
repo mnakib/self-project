@@ -12,7 +12,7 @@
 
 ```bash
 # Variables
-Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
+Subscription_ID=Prod-Beyn
 
 # Set the default subscription
 az account set --subscription $Subscription_ID
@@ -22,12 +22,14 @@ az account set --subscription $Subscription_ID
 ```bash
 # Variables			
 Random_Number=$(echo $((100 + RANDOM % 1)))
-ENV=nonprod
+ENV=prod
 RGName=rg-bea-$ENV-beyn-$ENV-ne-$Random_Number
 AzureRegion=westeurope
-Subscription_ID=23d2cf3f-c98e-44c5-8cca-52cc13acad13
 
-az group create --name $RGName --location $AzureRegion --subscription $Subscription_ID
+
+az group create --name $RGName \
+--location $AzureRegion \
+--subscription $Subscription_ID
 ```
 
 ### Creating the Virtual Network and Subnets
@@ -37,7 +39,8 @@ az group create --name $RGName --location $AzureRegion --subscription $Subscript
 ```bash
 # Variables			
 VNet_Name=vnet-bea-$ENV-beyn-$ENV-ne-$Random_Number
-VNet_AddressPrefix=10.5.0.0/20
+VNet_Second_Bit=6
+VNet_AddressPrefix=10.$VNet_Second_Bit.0.0/20
 
 # Register the Network Provider
 az provider register --namespace Microsoft.Network
@@ -350,7 +353,7 @@ az network bastion create \
 #### Create the Application Gateway Public IP
 ```bash
 # Variables
-APPGW_PublicIP_Name=app-agw-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
+APPGW_PublicIP_Name=app-agw-pub-ip-bea-$ENV-beyn-$ENV-ne-$Random_Number
 APPGW_PublicIP_SKU=Standard
 APPGW_PublicIP_Tier=Regional
 APPGW_PublicIP_AllocationMethod="Static"
@@ -368,7 +371,7 @@ az network public-ip create \
 
 ```bash
 # Variables
-APPGW_Name="app_gw-bea-non_prod_partenaire-nonprod-ne-$(echo $((100 + RANDOM % 1)))"
+APPGW_Name=app-gw-bea-$ENV-beyn-$ENV-ne-$RandomNumber
 APPGW_SKU="WAF_v2"
 APPGW_CAPACITY=2
 APPGW_FE_PORT=80
@@ -399,6 +402,8 @@ az network application-gateway create \
 WEB_SSH_Key_Name=web-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 APP_SSH_Key_Name=app-ssh-key-bea-nonprod-beyn-nonprod-ne-100
 SFTP_SSH_Key_Name=sftp-ssh-key-bea-nonprod-beyn-nonprod-ne-100
+SFTP_SSH_Key_Name=db-ssh-key-bea-nonprod-beyn-nonprod-ne-100
+
 ```
 
 
@@ -460,6 +465,15 @@ az role assignment create --role $Vault_Role \
 --scope /subscriptions/$SubID/resourceGroups/$RGName/providers/Microsoft.KeyVault/vaults/$Vault_Name
 ```
 
+
+
+## Disk Encryptin Set Creation
+```bash
+WEB_DES_Name=des-web-bea-nonprod-beyn-nonprod-ne-100
+APP_DES_Name=des-app-bea-nonprod-beyn-nonprod-ne-100
+SFTP_DES_Name=des-sftp-bea-nonprod-beyn-nonprod-ne-100
+DB_DES_Name=des-db-bea-nonprod-beyn-nonprod-ne-100
+```
 
 ## NAT Gateway Creation
 #### Create the NAT Gateway Public IP
