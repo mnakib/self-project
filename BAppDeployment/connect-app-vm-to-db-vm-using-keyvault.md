@@ -106,4 +106,3 @@ This is article explains how to connect the app vm to the db vm in Azure, where 
 ---
 
 
-Would you like me to sketch this as a **diagram** (App VM → Key Vault → DB VM) so you can use it in your documentation?
