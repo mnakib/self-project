@@ -39,7 +39,7 @@ This is article explains how to connect the app vm to the db vm in Azure, where 
      ```
 
    - 
-   - Example in Python:
+   - Example in Java:
      ```java
      import com.azure.identity.DefaultAzureCredentialBuilder;
      import com.azure.identity.DefaultAzureCredential;
@@ -90,13 +90,14 @@ This is article explains how to connect the app vm to the db vm in Azure, where 
 
 2. **Database Authentication**
    - The app uses the retrieved credentials to connect:
+     Example in Python
      ```python
      import pyodbc
 
      conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_vm_private_ip};DATABASE={db_name};UID={db_user};PWD={db_pass}"
      conn = pyodbc.connect(conn_str)
      ```
-
+   Example in Java
      ```java
      conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_vm_private_ip};DATABASE={db_name};UID={db_user};PWD={db_pass}"      conn = pyodbc.connect(conn_str)
      ```
