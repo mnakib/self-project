@@ -21,7 +21,7 @@ The VPN Gateway requires a dedicated subnet named `GatewaySubnet`.
 1.  Navigate to the **vnet-bea-nonprod-beyn-nonprod-ne-100** Virtual Network.
 2.  In the left menu, select **Subnets**.
 3.  Click **+ Gateway subnet** at the top. The name will auto-populate as **`GatewaySubnet`**.
-4.  Specify a **Subnet address range**. It's recommended to use a minimum size of **/27** (e.g., 10.0.0.0/27), or **/26** to allow for future expansion.
+4.  Specify the **10.5.11.0/26** Subnet address range.
 5.  Click **Save**.
 
 ### 2- Create the Azure Virtual Network Gateway (VNG)
@@ -34,12 +34,11 @@ The VNG is the Azure side of the VPN connection.
     * **Region**: Select the same region as your VNet.
     * **Name**: Enter a name for your gateway: vng-bea-nonprod-beyn-nonprod-ne-101
     * **Gateway type**: Select **VPN**.
-    * **VPN type**: Select **Route-based** (recommended) or **Policy-based**.
-    * **SKU**: Select the appropriate SKU (e.g., **VpnGw1**).
-    * **Virtual network**: Select the **VNet** named .
-    * **Public IP address**: Select **Create new**, enter a **Public IP address name**, and choose the **Standard** SKU.
+    * **SKU**: Select the appropriate SKU: **VpnGw2AZ**).
+    * **Virtual network**: Select the VNet and the **GatewaySubnet** subnet .
+    * **Public IP address**: Select **Create new**, enter a **vgw-pub-ip-bea-nonprod-beyn-nonprod-ne-100** as the name, and choose the **Standard** SKU.
     * **Enable active-active mode**: Leave as **Disabled** (for a single S2S tunnel).
-    * **Configure BGP**: Leave as **Disabled** (unless you plan to use BGP routing).
+    * **Configure BGP**: Leave as **Disabled**, unless BGP routing is used.
 3.  Click **Review + create**, then **Create**. *This deployment can take 30 to 45 minutes to complete.*
 
 ### 3- Create the Local Network Gateway (LNG)
