@@ -34,7 +34,7 @@ The VNG is the Azure side of the VPN connection.
     * **Region**: Select the same region as your VNet.
     * **Name**: Enter a name for your gateway: vng-bea-nonprod-beyn-nonprod-ne-101
     * **Gateway type**: Select **VPN**.
-    * **SKU**: Select the appropriate SKU: **VpnGw2AZ**).
+    * **SKU**: Select the appropriate SKU: **VpnGw2AZ**.
     * **Virtual network**: Select the VNet and the **GatewaySubnet** subnet .
     * **Public IP address**: Select **Create new**, enter a **vgw-pub-ip-bea-nonprod-beyn-nonprod-ne-100** as the name, and choose the **Standard** SKU.
     * **Enable active-active mode**: Leave as **Disabled** (for a single S2S tunnel).
