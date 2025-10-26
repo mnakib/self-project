@@ -19,7 +19,7 @@ This is article explains how to connect the app vm to the db vm in Azure, where 
    - Example:
      - `db-name` → `mydb`
      - `db-username` → `dbadmin`
-     - `db-password` → `SuperSecureP@ssw0rd`
+     - `db-password` → `SecureP@ssw0rd`
 
 4. **App VM Retrieves Secrets Securely**
    - Inside the App VM, your application (Python, .NET, Java, etc.) uses the **Azure Identity SDK** to authenticate via the VM’s managed identity.
@@ -47,40 +47,57 @@ This is article explains how to connect the app vm to the db vm in Azure, where 
      import com.azure.security.keyvault.secrets.SecretClientBuilder;
      import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 
+
      public class KeyVaultExample {
          public static void main(String[] args) {
               // Replace with your Key Vault URL
-              String keyVaultUrl = "https://<your-keyvault-name>.vault.azure.net/";
+              String keyVaultUrl = String keyVaultUri = "https://kvtvmdb1nprdne.vault.azure.net/";
 
-        // Create a credential using DefaultAzureCredential
-        DefaultAzureCredential credential = new DefaultAzureCredentialBuilder().build();
 
-        // Build the SecretClient
-        SecretClient client = new SecretClientBuilder()
-                .vaultUrl(keyVaultUrl)
-                .credential(credential)
-                .buildClient();
+             // Create a credential using DefaultAzureCredential
+             DefaultAzureCredential credential = new DefaultAzureCredentialBuilder().build();
 
-        // Retrieve secrets
-        KeyVaultSecret dbUserSecret = client.getSecret("db-username");
-        KeyVaultSecret dbPassSecret = client.getSecret("db-password");
-        KeyVaultSecret dbNameSecret = client.getSecret("db-name");
+             // 1. Establish the client using Managed Identity (DefaultAzureCredential)
+             SecretClient secretClient = new SecretClientBuilder()
+                 .vaultUrl(keyVaultUri)
+                 .credential(credential) // Uses Managed Identity automatically
+                 .build();
 
-        String dbUser = dbUserSecret.getValue();
-        String dbPass = dbPassSecret.getValue();
-        String dbName = dbNameSecret.getValue();
+             // 2.0 Retrieve the secret values
+             String dbName = secretClient.getSecret("db-name").getValue();
+             String dbUser = secretClient.getSecret("db-username").getValue();
+             String dbPassword = secretClient.getSecret("db-password").getValue();
+   
+             // 2.1 Print them (for demo only — don’t log secrets in production!)
+             System.out.println("DB User: " + dbUser);
+             System.out.println("DB Pass: " + dbPass);
+             System.out.println("DB Name: " + dbName);
 
-        // Print them (for demo only — don’t log secrets in production!)
-        System.out.println("DB User: " + dbUser);
-        System.out.println("DB Pass: " + dbPass);
-        System.out.println("DB Name: " + dbName);
-        }
-      }
+
+             // 3. Construct the final JDBC URL and connection (Step 2)
+             String finalJdbcUrl = dbName + "?user=" + dbUser + "&password=" + dbPassword + "&sslmode=require";
+
+         }
+     }
+     
      ```
 
    - No credentials are hardcoded — the VM identity handles auth.
 
+     // Now use 'finalJdbcUrl', 'dbUser', and 'dbPassword' to establish the connection...
+  
+     ```bash
+     jdbc:postgresql:"//azure-db-postgres-bea-prod-beyn-prod-ne-100.postgres.database.azure.com:5432/" + dbName + "?user=" + dbUser + "&password=" + dbPassword + "&sslmode=require";
+     ```
+
+
+Le resultat ConnectionString final JDBC sera comme suit:
+
+```bash
+jdbc:postgresql://azure-db-postgres-bea-prod-beyn-prod-ne-100.postgres.database.azure.com:5432/bea-international?user=bea_user&password={your_password}&sslmode=require
+```
 ---
+
 
 ## How the App VM Connects to the DB VM
 
