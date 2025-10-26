@@ -105,21 +105,6 @@ jdbc:postgresql://azure-db-postgres-bea-prod-beyn-prod-ne-100.postgres.database.
    - Ensure the **App Subnet** can reach the **DB Subnet** (via NSG rules, UDRs, and no firewall blocks).
    - Typically, allow inbound DB port (e.g., 1433 for SQL Server, 3306 for MySQL, 5432 for PostgreSQL) from the App Subnet.
 
-2. **Database Authentication**
-   - The app uses the retrieved credentials to connect:
-     Example in Python
-     ```python
-     import pyodbc
-
-     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_vm_private_ip};DATABASE={db_name};UID={db_user};PWD={db_pass}"
-     conn = pyodbc.connect(conn_str)
-     ```
-   Example in Java
-     ```java
-     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={db_vm_private_ip};DATABASE={db_name};UID={db_user};PWD={db_pass}"      conn = pyodbc.connect(conn_str)
-     ```
-   - Replace with the appropriate driver for your DB engine.
-
 ---
 
 
